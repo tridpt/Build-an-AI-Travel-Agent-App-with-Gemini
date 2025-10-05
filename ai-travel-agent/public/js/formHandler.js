@@ -203,68 +203,83 @@ Please begin the itinerary now.`;
     }
     
     enhanceWithBookingLinks(text, destination) {
-    // Xử lý định dạng chi tiết cho khách sạn
-    text = text.replace(/🏨\s*([^|\n]+)\s*\|([^|\n]*)\|([^|\n]*)\|?([^\n]*)/g, (match, name, address, price, rating) => {
-        name = name.replace(/\*\*/g, '').trim();
-        address = address.trim();
-        price = price.trim();
-        rating = rating.trim();
-        const bookingQuery = encodeURIComponent(`${name} ${destination || ''}`);
-        const agodaQuery = encodeURIComponent(`${name} ${destination || ''}`);
-        const mapsQuery = encodeURIComponent(`${name} ${address} ${destination || ''}`);
-        const bookingLabel = currentLang === 'vi' ? 'Đặt phòng' : 'Book Now';
-        return `🏨 **${name}**
-📍 ${address}
-💵 ${price}
-${rating ? '⭐ ' + rating : ''}
-**${bookingLabel}:**
+        // Xử lý định dạng chi tiết có dấu |
+        text = text.replace(/🏨\s*([^|\n]+)\s*\|([^|\n]*)\|([^|\n]*)\|?([^\n]*)/g, (match, name, address, price, rating) => {
+            name = name.replace(/\*\*/g, '').trim();
+            const originalName = name;
+            const searchName = name.split('(')[0].trim();
+            const bookingQuery = encodeURIComponent(`${searchName} ${destination || ''}`);
+            const mapsQuery = encodeURIComponent(`${searchName} ${address.trim()} ${destination || ''}`);
+            return `🏨 **${originalName}** | ${address} | ${price} | ${rating}
+**${t('bookingLabel')}:**
 - [Booking.com](https://www.booking.com/search.html?ss=${bookingQuery})
-- [Agoda](https://www.agoda.com/search?city=${agodaQuery})
-- [Google Maps](https://www.google.com/maps/search/?api=1&query=${mapsQuery})
----`;
-    });
-
-    // Xử lý định dạng chi tiết cho nhà hàng
-    text = text.replace(/🍽️\s*([^|\n]+)\s*\|([^|\n]*)\|([^|\n]*)\|?([^\n]*)/g, (match, name, address, price, specialty) => {
-        name = name.replace(/\*\*/g, '').trim();
-        address = address.trim();
-        price = price.trim();
-        specialty = specialty.trim();
-        const mapsQuery = encodeURIComponent(`${name} ${address} ${destination || ''}`);
-        const googleQuery = encodeURIComponent(`${name} restaurant ${destination || ''}`);
-        const searchLabel = currentLang === 'vi' ? 'Tìm kiếm' : 'Search';
-        return `🍽️ **${name}**
-📍 ${address}
-💵 ${price}
-${specialty ? '🍴 ' + specialty : ''}
-**${searchLabel}:**
-- [Google Maps](https://www.google.com/maps/search/?api=1&query=${mapsQuery})
-- [Google Search](https://www.google.com/search?q=${googleQuery})
----`;
-    });
-
-    // Xử lý các dòng khách sạn đơn giản
-    text = text.replace(/^🏨\s*([^|\n\[\]]+)$/gm, (match, hotelInfo) => {
-        const cleanHotelInfo = hotelInfo.trim();
-        const searchQuery = encodeURIComponent(cleanHotelInfo + ' ' + (destination || ''));
-        return `🏨 ${cleanHotelInfo}
+- [Agoda](https://www.agoda.com/search?city=${bookingQuery})
+- [Google Maps](https://www.google.com/maps/search/?api=1&query=${mapsQuery})`;
+        });
+    
+        // Xử lý các khối thông tin khách sạn (multi-line)
+        text = text.replace(/(^\s*\*?\s*🏨[^\S\n]*.*(?:\n^\s*.*[📍💵⭐].*)*)/gm, (match) => {
+            if (match.includes('|') || match.includes('[Booking.com]')) return match;
+    
+            const lines = match.split('\n');
+            const nameLine = lines[0];
+            let hotelName = nameLine.replace(/^\s*\*?\s*🏨[^\S\n]*/, '').replace(/\*\*/g, '').trim();
+    
+            let address = '';
+            const addressLine = lines.find(line => line.includes('📍'));
+            if (addressLine) {
+                address = addressLine.replace(/[^\S\n]*📍[^\S\n]*/, '').trim();
+            }
+    
+            const searchInfo = hotelName.split('(')[0].trim();
+    
+            if (searchInfo) {
+                const searchQuery = encodeURIComponent(searchInfo + ' ' + (destination || ''));
+                const mapsQuery = encodeURIComponent(`${searchInfo} ${address} ${destination || ''}`.trim());
+                const bookingLabel = t('bookingLabel');
+                
+                const links = `**${bookingLabel}:**
 - [Booking.com](https://www.booking.com/search.html?ss=${searchQuery})
 - [Agoda](https://www.agoda.com/search?city=${searchQuery})
-- [Google Maps](https://www.google.com/maps/search/?api=1&query=${searchQuery})`;
-    });
-
-    // Xử lý các dòng nhà hàng/địa điểm đơn giản
-    text = text.replace(/^🍽️\s*([^|\n\[\]]+)$/gm, (match, restaurantInfo) => {
-        const cleanRestaurantInfo = restaurantInfo.trim();
-        const mapsQuery = encodeURIComponent(cleanRestaurantInfo + ' ' + (destination || ''));
-        const googleQuery = encodeURIComponent(cleanRestaurantInfo + ' restaurant ' + (destination || ''));
-        return `🍽️ ${cleanRestaurantInfo}
+- [Google Maps](https://www.google.com/maps/search/?api=1&query=${mapsQuery})`;
+    
+                return `${match}\n${links}`;
+            }
+            return match;
+        });
+    
+        // Xử lý các khối thông tin nhà hàng (multi-line)
+        text = text.replace(/(^\s*\*?\s*🍽️[^\S\n]*.*(?:\n^\s*.*[📍💵🍴].*)*)/gm, (match) => {
+            if (match.includes('|') || match.includes('[Google Maps]')) return match;
+    
+            const lines = match.split('\n');
+            const nameLine = lines[0];
+            let restaurantName = nameLine.replace(/^\s*\*?\s*🍽️[^\S\n]*/, '').replace(/\*\*/g, '').trim();
+    
+            let address = '';
+            const addressLine = lines.find(line => line.includes('📍'));
+            if (addressLine) {
+                address = addressLine.replace(/[^\S\n]*📍[^\S\n]*/, '').trim();
+            }
+    
+            const searchInfo = restaurantName.split('(')[0].trim();
+    
+            if (searchInfo) {
+                const mapsQuery = encodeURIComponent(`${searchInfo} ${address} ${destination || ''}`.trim());
+                const googleQuery = encodeURIComponent(`${searchInfo} restaurant ${destination || ''}`);
+                const searchLabel = t('searchLabel');
+                
+                const links = `**${searchLabel}:**
 - [Google Maps](https://www.google.com/maps/search/?api=1&query=${mapsQuery})
 - [Google Search](https://www.google.com/search?q=${googleQuery})`;
-    });
-
-    return text;
-}
+                
+                return `${match}\n${links}`;
+            }
+            return match;
+        });
+    
+        return text;
+    }
     
     editPlan() {
         this.planResult.style.display = 'none';
