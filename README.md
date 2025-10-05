@@ -319,7 +319,7 @@ This project is licensed under the **MIT License** - see the LICENSE file for de
 - [ ] Social sharing features
 - [ ] Trip collaboration (shared planning)
 - [ ] Mobile app (React Native)
-- [ ] Weather API integration
+- [x] Weather API integration
 - [ ] Currency conversion API
 - [ ] Map view of itinerary
 - [ ] Calendar export (iCal format)
