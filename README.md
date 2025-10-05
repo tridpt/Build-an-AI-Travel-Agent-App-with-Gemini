@@ -1,31 +1,4 @@
-tridpt: này là lỗi gì thế'
-
-GitHub Copilot: 
-
-tridpt: xin chào
-
-GitHub Copilot: Bạn chưa cung cấp thông tin về lỗi cụ thể (ví dụ: thông báo lỗi, hình ảnh lỗi, hoặc mô tả lỗi).  
-Nếu bạn đang gặp lỗi khi chạy dự án trong thư mục ai-travel-agent, vui lòng gửi chi tiết lỗi (console log, terminal output, hoặc ảnh chụp màn hình lỗi) để mình hỗ trợ chính xác hơn.
-
-Bạn có thể thử các bước sau để kiểm tra lỗi cơ bản:
-1. Mở terminal tại thư mục dự án.
-2. Chạy lệnh cài đặt dependencies:
-   ```
-   npm install
-   ```
-3. Chạy dự án (tùy theo hướng dẫn trong README.md, ví dụ):
-   ```
-   npm start
-   ```
-4. Nếu có lỗi, copy thông báo lỗi và gửi lại để mình hỗ trợ nhé!
-
-tridpt: này là lỗi gì vậy
-
-GitHub Copilot: 
-
-tridpt: viết lại cho tôi cái readme đi
-
-Workspace: Collecting workspace information# 🌍 AI Travel Agent - Powered by Google Gemini
+🌍 AI Travel Agent - Powered by Google Gemini
 
 A smart, multilingual travel planning assistant that creates personalized travel itineraries using Google Gemini AI. Plan your perfect trip with AI-powered recommendations for destinations, hotels, restaurants, and activities.
 
