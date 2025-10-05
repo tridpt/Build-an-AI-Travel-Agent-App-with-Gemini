@@ -1,34 +1,26 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import dotenv from 'dotenv';
 
-dotenv.config();
+export class GeminiService {
+  private genAI: GoogleGenerativeAI;
+  private model: any;
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+  constructor() {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error('GEMINI_API_KEY is not set in environment variables');
+    }
+    this.genAI = new GoogleGenerativeAI(apiKey);
+    this.model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+  }
 
-export async function getTravelRecommendations(userMessage: string): Promise<string> {
-  try {
-    console.log('Sending request to Gemini with message:', userMessage);
-    console.log('API Key exists:', !!process.env.GEMINI_API_KEY);
-    
-    // Sử dụng Gemini 2.5 Flash (model mới nhất và miễn phí)
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-    
-    const prompt = `You are a helpful travel agent assistant. Provide detailed travel recommendations, including destinations, activities, accommodations, and budget estimates. You can respond in Vietnamese if the user asks in Vietnamese.
-
-User question: ${userMessage}`;
-
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-
-    console.log('Gemini Response received');
-    return text || "Sorry, I couldn't generate a response.";
-  } catch (error: any) {
-    console.error('Gemini API Error Details:', {
-      message: error.message,
-      status: error.status,
-      code: error.code
-    });
-    throw error;
+  async generateResponse(prompt: string): Promise<string> {
+    try {
+      const result = await this.model.generateContent(prompt);
+      const response = await result.response;
+      return response.text();
+    } catch (error) {
+      console.error('Gemini API Error:', error);
+      throw new Error('Failed to generate response from Gemini API');
+    }
   }
 }

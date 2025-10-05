@@ -1,264 +1,324 @@
 class TripExporter {
     constructor() {
         this.tripData = null;
-        this.planContent = null;
+        this.itineraryHTML = '';
     }
-    
-    setTripData(formData, planContent) {
+
+    setTripData(formData, itineraryHTML) {
         this.tripData = formData;
-        this.planContent = planContent;
+        this.itineraryHTML = itineraryHTML;
     }
-    
-    // Export as PDF
+
+    cleanHTMLForExport(html) {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        
+        // Remove all <ol> numbering by converting to <ul>
+        tempDiv.querySelectorAll('ol').forEach(ol => {
+            const ul = document.createElement('ul');
+            ul.innerHTML = ol.innerHTML;
+            Array.from(ol.attributes).forEach(attr => {
+                ul.setAttribute(attr.name, attr.value);
+            });
+            ol.parentNode.replaceChild(ul, ol);
+        });
+        
+        return tempDiv.innerHTML;
+    }
+
     exportToPDF() {
-        const element = document.getElementById('planContent');
-        const destination = this.tripData?.destination || 'Trip';
-        const filename = `${destination}_${new Date().getTime()}.pdf`;
-        
-        // Use browser's print to PDF
-        const printWindow = window.open('', '_blank');
-        printWindow.document.write(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>${destination} - Travel Itinerary</title>
-                <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        padding: 20px;
-                        line-height: 1.6;
-                    }
-                    h1, h2, h3 { color: #667eea; }
-                    strong { color: #667eea; }
-                    a { color: #667eea; text-decoration: none; }
-                    hr { border: 1px solid #e0e0e0; margin: 20px 0; }
-                </style>
-            </head>
-            <body>
-                <h1>🌍 ${destination} - Travel Itinerary</h1>
-                <p><strong>Generated on:</strong> ${new Date().toLocaleDateString()}</p>
-                <hr>
-                ${element.innerHTML}
-            </body>
-            </html>
-        `);
-        printWindow.document.close();
-        printWindow.focus();
-        setTimeout(() => {
-            printWindow.print();
-        }, 500);
+        if (!this.itineraryHTML) {
+            alert(currentLang === 'vi' ? 'Chưa có lịch trình để xuất!' : 'No itinerary to export!');
+            return;
+        }
+
+        // Create a simple, clean container
+        const printWindow = document.createElement('div');
+        printWindow.innerHTML = `
+            <div style="font-family: Arial, sans-serif; padding: 30px; max-width: 800px; margin: 0 auto;">
+                <h1 style="color: #667eea; text-align: center; margin-bottom: 30px; border-bottom: 3px solid #667eea; padding-bottom: 15px;">
+                    ✈️ ${this.tripData?.destination || 'Travel'} Itinerary
+                </h1>
+                <div style="line-height: 1.8; color: #333;">
+                    ${this.cleanHTMLForExport(this.itineraryHTML)}
+                </div>
+            </div>
+            <style>
+                h1 { color: #667eea; font-size: 24px; margin: 25px 0 15px; border-bottom: 2px solid #667eea; padding-bottom: 8px; }
+                h2 { color: #667eea; font-size: 20px; margin: 20px 0 12px; border-left: 4px solid #667eea; padding-left: 12px; }
+                h3 { color: #764ba2; font-size: 18px; margin: 18px 0 10px; }
+                h4 { color: #555; font-size: 16px; margin: 15px 0 8px; }
+                p { margin: 10px 0; line-height: 1.8; }
+                ul, ol { list-style: none; margin: 12px 0; padding-left: 0; }
+                li { margin: 10px 0; padding-left: 20px; position: relative; }
+                li:before { content: "•"; color: #667eea; font-weight: bold; position: absolute; left: 0; }
+                a { color: #667eea; text-decoration: none; font-weight: 600; }
+                strong, b { color: #667eea; font-weight: 700; }
+            </style>
+        `;
+
+        // PDF configuration
+        const opt = {
+            margin: 15,
+            filename: `${this.tripData?.destination || 'trip'}_${Date.now()}.pdf`,
+            image: { type: 'jpeg', quality: 0.95 },
+            html2canvas: { 
+                scale: 2,
+                useCORS: true,
+                logging: false
+            },
+            jsPDF: { 
+                unit: 'mm', 
+                format: 'a4', 
+                orientation: 'portrait'
+            }
+        };
+
+        // Show loading
+        const exportBtn = document.getElementById('exportButton');
+        const originalText = exportBtn ? exportBtn.textContent : '';
+        if (exportBtn) exportBtn.textContent = '⏳ Đang tạo PDF...';
+
+        // Generate PDF
+        html2pdf()
+            .set(opt)
+            .from(printWindow)
+            .save()
+            .then(() => {
+                if (exportBtn) exportBtn.textContent = originalText;
+            })
+            .catch(err => {
+                console.error('PDF Error:', err);
+                alert('Lỗi khi tạo PDF. Vui lòng thử lại!');
+                if (exportBtn) exportBtn.textContent = originalText;
+            });
     }
-    
-    // Export as HTML
+
     exportToHTML() {
-        const element = document.getElementById('planContent');
-        const destination = this.tripData?.destination || 'Trip';
-        const filename = `${destination}_${new Date().getTime()}.html`;
-        
-        const htmlContent = `
-<!DOCTYPE html>
-<html lang="${currentLang}">
+        if (!this.itineraryHTML) {
+            alert(currentLang === 'vi' ? 'Chưa có lịch trình để xuất!' : 'No itinerary to export!');
+            return;
+        }
+
+        const cleanedHTML = this.cleanHTMLForExport(this.itineraryHTML);
+
+        const htmlContent = `<!DOCTYPE html>
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${destination} - Travel Itinerary</title>
+    <title>${this.tripData?.destination || 'Travel'} Itinerary</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 40px 20px;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.8;
+            color: #333;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            padding: 20px;
         }
         .container {
+            max-width: 900px;
+            margin: 0 auto;
             background: white;
             padding: 40px;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
         }
-        h1 { 
-            color: #667eea; 
+        h1 {
+            color: #667eea;
             font-size: 2.5em;
-            margin-bottom: 10px;
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            margin-bottom: 30px;
         }
-        h2 { 
-            color: #667eea; 
-            font-size: 2em;
-            margin-top: 30px;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 10px;
+        h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin: 25px 0 15px;
+            padding-left: 15px;
+            border-left: 5px solid #667eea;
         }
-        h3 { 
-            color: #764ba2; 
-            font-size: 1.5em;
+        h3 {
+            color: #764ba2;
+            font-size: 1.4em;
+            margin: 20px 0 12px;
         }
-        strong { 
-            color: #667eea; 
-            font-weight: 600;
+        h4 {
+            color: #555;
+            font-size: 1.2em;
+            margin: 18px 0 10px;
         }
-        a { 
-            display: inline-block;
-            padding: 6px 12px;
-            margin: 5px 5px 5px 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white !important;
-            border-radius: 6px;
+        p {
+            margin: 12px 0;
+            line-height: 1.8;
+        }
+        a {
+            color: #667eea;
             text-decoration: none;
             font-weight: 600;
-            font-size: 14px;
             transition: all 0.3s;
         }
         a:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
-        }
-        hr { 
-            border: none;
-            border-top: 1px dashed #e0e0e0;
-            margin: 20px 0;
+            color: #764ba2;
+            text-decoration: underline;
         }
         ul, ol {
-            margin-left: 25px;
-            margin-bottom: 15px;
+            list-style: none;
+            margin: 15px 0;
+            padding-left: 0;
         }
         li {
-            margin-bottom: 8px;
+            margin: 12px 0;
+            padding-left: 25px;
+            position: relative;
         }
-        p {
-            margin-bottom: 12px;
-            line-height: 1.8;
+        li:before {
+            content: "• ";
+            color: #667eea;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            font-size: 1.2em;
         }
-        .metadata {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            border-left: 4px solid #667eea;
+        strong, b {
+            color: #667eea;
+            font-weight: 700;
         }
-        .footer {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 2px solid #e0e0e0;
-            text-align: center;
-            color: #666;
-            font-size: 14px;
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🌍 ${destination}</h1>
-        <div class="metadata">
-            <p><strong>📅 ${currentLang === 'vi' ? 'Ngày tạo' : 'Generated'}:</strong> ${new Date().toLocaleString(currentLang === 'vi' ? 'vi-VN' : 'en-US')}</p>
-            ${this.tripData ? `
-                <p><strong>📍 ${currentLang === 'vi' ? 'Điểm đến' : 'Destination'}:</strong> ${this.tripData.destination || 'N/A'}</p>
-                <p><strong>📅 ${currentLang === 'vi' ? 'Thời gian' : 'Duration'}:</strong> ${this.tripData.startDate} → ${this.tripData.endDate}</p>
-                <p><strong>💰 ${currentLang === 'vi' ? 'Ngân sách' : 'Budget'}:</strong> ${this.tripData.budget.toLocaleString()} ${t('currency')}</p>
-                <p><strong>👥 ${currentLang === 'vi' ? 'Số người' : 'Travelers'}:</strong> ${this.tripData.travelers}</p>
-            ` : ''}
-        </div>
-        <hr>
-        ${element.innerHTML}
-        <div class="footer">
-            <p>🤖 ${currentLang === 'vi' ? 'Được tạo bởi' : 'Generated by'} AI Travel Agent</p>
-            <p>${currentLang === 'vi' ? 'Trợ lý du lịch thông minh' : 'Smart Travel Assistant'}</p>
-        </div>
+        <h1>✈️ ${this.tripData?.destination || 'Travel'} Itinerary</h1>
+        ${cleanedHTML}
     </div>
 </body>
 </html>`;
-        
-        this.downloadFile(htmlContent, filename, 'text/html');
+
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${this.tripData?.destination || 'trip'}_${Date.now()}.html`;
+        a.click();
+        URL.revokeObjectURL(url);
     }
-    
-    // Export as Markdown
+
     exportToMarkdown() {
-        const element = document.getElementById('planContent');
-        const destination = this.tripData?.destination || 'Trip';
-        const filename = `${destination}_${new Date().getTime()}.md`;
-        
-        // Convert HTML to Markdown
-        let markdown = `# 🌍 ${destination}\n\n`;
-        markdown += `**${currentLang === 'vi' ? 'Ngày tạo' : 'Generated'}:** ${new Date().toLocaleString(currentLang === 'vi' ? 'vi-VN' : 'en-US')}\n\n`;
-        
-        if (this.tripData) {
-            markdown += `## ${currentLang === 'vi' ? 'Thông tin chuyến đi' : 'Trip Information'}\n\n`;
-            markdown += `- **${currentLang === 'vi' ? 'Điểm đến' : 'Destination'}:** ${this.tripData.destination || 'N/A'}\n`;
-            markdown += `- **${currentLang === 'vi' ? 'Thời gian' : 'Duration'}:** ${this.tripData.startDate} → ${this.tripData.endDate}\n`;
-            markdown += `- **${currentLang === 'vi' ? 'Ngân sách' : 'Budget'}:** ${this.tripData.budget.toLocaleString()} ${t('currency')}\n`;
-            markdown += `- **${currentLang === 'vi' ? 'Số người' : 'Travelers'}:** ${this.tripData.travelers}\n\n`;
+        if (!this.itineraryHTML) {
+            alert(currentLang === 'vi' ? 'Chưa có lịch trình để xuất!' : 'No itinerary to export!');
+            return;
         }
+
+        const cleanedHTML = this.cleanHTMLForExport(this.itineraryHTML);
         
-        markdown += `---\n\n`;
+        let markdown = `# ✈️ ${this.tripData?.destination || 'Travel'} Itinerary\n\n`;
         
-        // Simple HTML to Markdown conversion
-        let content = element.innerHTML;
-        content = content.replace(/<h1[^>]*>(.*?)<\/h1>/g, '# $1\n\n');
-        content = content.replace(/<h2[^>]*>(.*?)<\/h2>/g, '## $1\n\n');
-        content = content.replace(/<h3[^>]*>(.*?)<\/h3>/g, '### $1\n\n');
-        content = content.replace(/<strong>(.*?)<\/strong>/g, '**$1**');
-        content = content.replace(/<em>(.*?)<\/em>/g, '*$1*');
-        content = content.replace(/<a[^>]*href="([^"]*)"[^>]*>(.*?)<\/a>/g, '[$2]($1)');
-        content = content.replace(/<li>(.*?)<\/li>/g, '- $1\n');
-        content = content.replace(/<ul[^>]*>/g, '\n');
-        content = content.replace(/<\/ul>/g, '\n');
-        content = content.replace(/<ol[^>]*>/g, '\n');
-        content = content.replace(/<\/ol>/g, '\n');
-        content = content.replace(/<p[^>]*>(.*?)<\/p>/g, '$1\n\n');
-        content = content.replace(/<br\s*\/?>/g, '\n');
-        content = content.replace(/<hr\s*\/?>/g, '\n---\n\n');
-        content = content.replace(/<[^>]+>/g, '');
-        content = content.replace(/&nbsp;/g, ' ');
-        content = content.replace(/&amp;/g, '&');
-        content = content.replace(/&lt;/g, '<');
-        content = content.replace(/&gt;/g, '>');
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = cleanedHTML;
         
-        markdown += content;
-        
-        this.downloadFile(markdown, filename, 'text/markdown');
+        markdown += this.htmlToMarkdown(tempDiv);
+
+        const blob = new Blob([markdown], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${this.tripData?.destination || 'trip'}_${Date.now()}.md`;
+        a.click();
+        URL.revokeObjectURL(url);
     }
-    
-    // Export as plain text
+
     exportToText() {
-        const element = document.getElementById('planContent');
-        const destination = this.tripData?.destination || 'Trip';
-        const filename = `${destination}_${new Date().getTime()}.txt`;
+        if (!this.itineraryHTML) {
+            alert(currentLang === 'vi' ? 'Chưa có lịch trình để xuất!' : 'No itinerary to export!');
+            return;
+        }
+
+        const cleanedHTML = this.cleanHTMLForExport(this.itineraryHTML);
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = cleanedHTML;
         
         let text = `${'='.repeat(60)}\n`;
-        text += `${destination.toUpperCase()} - TRAVEL ITINERARY\n`;
+        text += `${this.tripData?.destination || 'TRAVEL'} ITINERARY\n`;
         text += `${'='.repeat(60)}\n\n`;
-        text += `${currentLang === 'vi' ? 'Ngày tạo' : 'Generated'}: ${new Date().toLocaleString(currentLang === 'vi' ? 'vi-VN' : 'en-US')}\n\n`;
-        
-        if (this.tripData) {
-            text += `${currentLang === 'vi' ? 'Điểm đến' : 'Destination'}: ${this.tripData.destination || 'N/A'}\n`;
-            text += `${currentLang === 'vi' ? 'Thời gian' : 'Duration'}: ${this.tripData.startDate} → ${this.tripData.endDate}\n`;
-            text += `${currentLang === 'vi' ? 'Ngân sách' : 'Budget'}: ${this.tripData.budget.toLocaleString()} ${t('currency')}\n`;
-            text += `${currentLang === 'vi' ? 'Số người' : 'Travelers'}: ${this.tripData.travelers}\n\n`;
-        }
-        
-        text += `${'-'.repeat(60)}\n\n`;
-        
-        // Convert HTML to plain text
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = element.innerHTML;
         text += tempDiv.textContent || tempDiv.innerText || '';
-        
-        this.downloadFile(text, filename, 'text/plain');
-    }
-    
-    // Helper function to download file
-    downloadFile(content, filename, mimeType) {
-        const blob = new Blob([content], { type: mimeType });
+
+        const blob = new Blob([text], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${this.tripData?.destination || 'trip'}_${Date.now()}.txt`;
+        a.click();
         URL.revokeObjectURL(url);
+    }
+
+    htmlToMarkdown(element) {
+        let markdown = '';
+        
+        element.childNodes.forEach(node => {
+            if (node.nodeType === Node.TEXT_NODE) {
+                const text = node.textContent.trim();
+                if (text) markdown += text + '\n';
+            } else if (node.nodeType === Node.ELEMENT_NODE) {
+                const tagName = node.tagName.toLowerCase();
+                
+                switch(tagName) {
+                    case 'h1':
+                        markdown += `\n# ${node.textContent}\n\n`;
+                        break;
+                    case 'h2':
+                        markdown += `\n## ${node.textContent}\n\n`;
+                        break;
+                    case 'h3':
+                        markdown += `\n### ${node.textContent}\n\n`;
+                        break;
+                    case 'h4':
+                        markdown += `\n#### ${node.textContent}\n\n`;
+                        break;
+                    case 'p':
+                        markdown += `${node.textContent}\n\n`;
+                        break;
+                    case 'a':
+                        markdown += `[${node.textContent}](${node.href})`;
+                        break;
+                    case 'strong':
+                    case 'b':
+                        markdown += `**${node.textContent}**`;
+                        break;
+                    case 'em':
+                    case 'i':
+                        markdown += `*${node.textContent}*`;
+                        break;
+                    case 'ul':
+                    case 'ol':
+                        node.querySelectorAll('li').forEach(li => {
+                            markdown += `- ${li.textContent}\n`;
+                        });
+                        markdown += '\n';
+                        break;
+                    default:
+                        markdown += this.htmlToMarkdown(node);
+                }
+            }
+        });
+        
+        return markdown;
     }
 }
 
-// Global instance
+// Initialize exporter
 const tripExporter = new TripExporter();

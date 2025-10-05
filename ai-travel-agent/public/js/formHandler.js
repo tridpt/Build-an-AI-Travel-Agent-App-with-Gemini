@@ -42,7 +42,7 @@ class TravelFormHandler {
     
     getFormData() {
         return {
-            startLocation: document.getElementById('startLocation').value.trim(), // Thêm dòng này
+            startLocation: document.getElementById('startLocation').value.trim(),
             destination: document.getElementById('destination').value.trim(),
             startDate: document.getElementById('startDate').value,
             endDate: document.getElementById('endDate').value,
@@ -188,6 +188,30 @@ Please begin the itinerary now.`;
                 const enhancedResponse = this.enhanceWithBookingLinks(data.response, formData.destination);
                 this.planContent.innerHTML = markdownToHtml(enhancedResponse);
                 this.planResult.style.display = 'block';
+                
+                // ← THÊM PHẦN WEATHER Ở ĐÂY
+                // Display weather if destination is provided
+                if (formData.destination && formData.destination.trim() !== '') {
+                    if (typeof weatherHandler !== 'undefined') {
+                        weatherHandler.setLanguage(currentLang);
+                        
+                        // Display current weather
+                        await weatherHandler.displayCurrentWeather(
+                            formData.destination, 
+                            'weather-current-container'
+                        );
+                        
+                        // Display forecast
+                        await weatherHandler.displayForecast(
+                            formData.destination, 
+                            'weather-forecast-container'
+                        );
+                    } else {
+                        console.warn('weatherHandler is not defined');
+                    }
+                }
+                // ← KẾT THÚC PHẦN WEATHER
+                
                 this.planResult.scrollIntoView({ behavior: 'smooth' });
                 
                 // Save trip data for export

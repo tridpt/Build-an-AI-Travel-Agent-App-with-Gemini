@@ -119,6 +119,13 @@
 
             <!-- Result Display -->
             <div id="planResult" class="plan-result" style="display: none;">
+                <!-- Weather Section - THÊM MỚI -->
+                <div class="weather-section" style="margin-bottom: 25px;">
+                    <div id="weather-current-container"></div>
+                    <div id="weather-forecast-container"></div>
+                </div>
+                <!-- End Weather Section -->
+
                 <div class="result-header">
                     <h2 data-i18n="resultTitle">🎉 Lịch trình của bạn</h2>
                     <div class="result-actions">
@@ -154,17 +161,12 @@
     </div>
 
     <!-- Load scripts in order -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="js/translations.js"></script>
     <script src="js/exportHandler.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/weatherHandler.js"></script>
     <script src="js/formHandler.js"></script>
-    <script src="js/weatherWidget.js"></script>
-    <script>
-        // Display weather when destination is selected
-        document.addEventListener('DOMContentLoaded', () => {
-            // Example: Show weather for a destination
-            weatherWidget.displayWeather('Hanoi, Vietnam', 'weather-container');
-        });
-    </script>
 </body>
 </html>
