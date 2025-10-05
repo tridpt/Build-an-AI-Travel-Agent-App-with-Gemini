@@ -699,3 +699,47 @@ small {
         text-align: center;
     }
 }
+
+/* Styling for Ordered Lists (Main Sections) */
+.plan-content ol {
+    list-style-type: none;
+    counter-reset: section-counter;
+    margin-left: 0;
+    padding-left: 0;
+}
+
+.plan-content ol > li {
+    counter-increment: section-counter;
+    margin-bottom: 25px;
+    position: relative;
+    padding-left: 45px; /* Create space for the number */
+}
+
+.plan-content ol > li::before {
+    content: counter(section-counter);
+    position: absolute;
+    left: 0;
+    top: -2px;
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(102, 126, 234, 0.4);
+}
+
+/* Consistent paragraph spacing */
+.plan-content p {
+    margin-bottom: 1em; 
+}
+
+/* Ensure nested lists are indented properly */
+.plan-content ul ul, .plan-content ol ul {
+    margin-top: 10px;
+    margin-left: 20px;
+}

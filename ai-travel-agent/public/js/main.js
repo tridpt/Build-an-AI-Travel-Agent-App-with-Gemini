@@ -15,26 +15,51 @@ tabButtons.forEach(button => {
 });
 
 // Markdown to HTML
-function markdownToHtml(text) {
-    text = text.replace(/^### (.*$)/gim, '<h3>$1</h3>');
-    text = text.replace(/^## (.*$)/gim, '<h2>$1</h2>');
-    text = text.replace(/^# (.*$)/gim, '<h1>$1</h1>');
-    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
-    text = text.replace(/```(.*?)```/gs, '<pre><code>$1</code></pre>');
-    text = text.replace(/`(.*?)`/g, '<code>$1</code>');
+function markdownToHtml(markdown) {
+    // Tách văn bản thành các khối dựa trên dòng trống
+    const blocks = markdown.split(/\n\s*\n/);
     
-    // Enhanced link rendering with target="_blank"
-    text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="booking-link">$1 🔗</a>');
-    
-    text = text.replace(/^\* (.*$)/gim, '<li>$1</li>');
-    text = text.replace(/^- (.*$)/gim, '<li>$1</li>');
-    text = text.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
-    text = text.replace(/^\d+\.\s+(.*$)/gim, '<li>$1</li>');
-    text = text.replace(/^---$/gim, '<hr>');
-    text = text.replace(/\n\n/g, '</p><p>');
-    text = text.replace(/\n/g, '<br>');
-    return '<p>' + text + '</p>';
+    const htmlBlocks = blocks.map(block => {
+        // Bỏ khoảng trắng thừa
+        block = block.trim();
+        if (block.length === 0) return '';
+
+        // Xử lý tiêu đề
+        if (block.startsWith('#### ')) return `<h4>${block.substring(5)}</h4>`;
+        if (block.startsWith('### ')) return `<h3>${block.substring(4)}</h3>`;
+        if (block.startsWith('## ')) return `<h2>${block.substring(3)}</h2>`;
+        if (block.startsWith('# ')) return `<h1>${block.substring(2)}</h1>`;
+
+        // Xử lý đường kẻ ngang
+        if (block === '---') return '<hr>';
+
+        // Xử lý danh sách (cả có thứ tự và không có thứ tự)
+        if (/^(\*|-|\d+\.) /m.test(block)) {
+            const lines = block.split('\n');
+            const listItems = lines.map(line => '<li>' + line.replace(/^(\*|-|\d+\.) /, '').trim() + '</li>').join('\n');
+            
+            // Xác định loại danh sách
+            if (block.startsWith('* ') || block.startsWith('- ')) {
+                return `<ul>\n${listItems}\n</ul>`;
+            } else {
+                return `<ol>\n${listItems}\n</ol>`;
+            }
+        }
+
+        // Mặc định là một đoạn văn
+        // Thay thế các ký tự xuống dòng đơn bằng thẻ <br>
+        return `<p>${block.replace(/\n/g, '<br>')}</p>`;
+    });
+
+    let finalHtml = htmlBlocks.join('\n');
+
+    // Xử lý các định dạng inline sau khi đã xử lý các khối
+    finalHtml = finalHtml.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    finalHtml = finalHtml.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    finalHtml = finalHtml.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="booking-link">$1 🔗</a>');
+    finalHtml = finalHtml.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+    return finalHtml;
 }
 
 // ===== CHAT TAB =====
