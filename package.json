@@ -1,0 +1,26 @@
+{
+  "name": "build-an-ai-travel-agent-app-with-openai",
+  "version": "1.0.0",
+  "description": "A smart AI Travel Agent built with OpenAI’s Responses API. It helps users plan trips, find flights, hotels, and attractions, and create detailed day-by-day itineraries — all powered by tool calling, structured outputs, and streaming responses.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "openai": "^6.1.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.6.2",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "ai-travel-agent",
+  "version": "1.0.0",
+  "description": "AI Travel Agent App with Google Gemini",
+  "main": "dist/app.js",
+  "scripts": {
+    "dev": "nodemon --exec ts-node src/app.ts",
+    "build": "tsc",
+    "start": "node dist/app.js"
+  },
+  "keywords": ["ai", "travel", "gemini"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "express": "^4.18.2",
+    "dotenv": "^16.3.1",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "@types/express": "^4.17.20",
+    "@types/node": "^20.8.0",
+    "@types/cors": "^2.8.15",
+    "ts-node": "^10.9.1",
+    "nodemon": "^3.0.1"
+  }
+}
