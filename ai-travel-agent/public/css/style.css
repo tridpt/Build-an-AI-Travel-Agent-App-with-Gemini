@@ -8,15 +8,13 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     padding: 20px;
 }
 
 .container {
     width: 100%;
-    max-width: 900px;
+    max-width: 1000px;
+    margin: 0 auto;
     background: white;
     border-radius: 20px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -26,10 +24,287 @@ body {
 h1 {
     text-align: center;
     color: #667eea;
-    margin-bottom: 20px;
-    font-size: 2em;
+    margin-bottom: 10px;
+    font-size: 2.5em;
 }
 
+.subtitle {
+    text-align: center;
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 1.1em;
+}
+
+/* Tab Navigation */
+.tab-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.tab-button {
+    flex: 1;
+    padding: 15px 20px;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: #666;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.tab-button:hover {
+    color: #667eea;
+}
+
+.tab-button.active {
+    color: #667eea;
+    border-bottom-color: #667eea;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Travel Form */
+.travel-form {
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.travel-form h2 {
+    color: #667eea;
+    margin-bottom: 25px;
+    font-size: 1.8em;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+input[type="text"],
+input[type="date"],
+input[type="number"],
+select,
+textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    transition: all 0.3s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+small {
+    display: block;
+    margin-top: 5px;
+    color: #999;
+    font-size: 13px;
+}
+
+#budgetDisplay {
+    color: #667eea;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* Checkbox Group */
+.checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: normal;
+    font-size: 14px;
+}
+
+.checkbox-group label:hover {
+    border-color: #667eea;
+    background: #f0f3ff;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: auto;
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.checkbox-group input[type="checkbox"]:checked + span {
+    color: #667eea;
+    font-weight: 600;
+}
+
+/* Generate Button */
+.generate-button {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 10px;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.generate-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5);
+}
+
+.generate-button:active {
+    transform: translateY(0);
+}
+
+.generate-button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Plan Result */
+.plan-result {
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 15px;
+    animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.result-header h2 {
+    color: #667eea;
+    font-size: 1.8em;
+}
+
+.edit-button {
+    padding: 10px 20px;
+    background: white;
+    color: #667eea;
+    border: 2px solid #667eea;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.edit-button:hover {
+    background: #667eea;
+    color: white;
+}
+
+.plan-content {
+    line-height: 1.8;
+    color: #333;
+}
+
+/* Markdown Styling in Plan Content */
+.plan-content h1, .plan-content h2, .plan-content h3 {
+    color: #667eea;
+    margin-top: 20px;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.plan-content h1 { font-size: 2em; }
+.plan-content h2 { font-size: 1.6em; }
+.plan-content h3 { font-size: 1.3em; }
+
+.plan-content ul, .plan-content ol {
+    margin-left: 25px;
+    margin-bottom: 15px;
+}
+
+.plan-content li {
+    margin-bottom: 8px;
+}
+
+.plan-content strong {
+    color: #667eea;
+    font-weight: 600;
+}
+
+.plan-content p {
+    margin-bottom: 12px;
+}
+
+.plan-content hr {
+    border: none;
+    border-top: 2px solid #e0e0e0;
+    margin: 20px 0;
+}
+
+/* Chat Styles (existing) */
 .chat-container {
     display: flex;
     flex-direction: column;
@@ -80,7 +355,6 @@ h1 {
     line-height: 1.6;
 }
 
-/* Markdown Styling */
 .bot-message h1, .bot-message h2, .bot-message h3 {
     color: #667eea;
     margin-top: 15px;
@@ -92,10 +366,6 @@ h1 {
 .bot-message h2 { font-size: 1.5em; }
 .bot-message h3 { font-size: 1.3em; }
 
-.bot-message p {
-    margin-bottom: 10px;
-}
-
 .bot-message ul, .bot-message ol {
     margin-left: 20px;
     margin-bottom: 10px;
@@ -103,7 +373,6 @@ h1 {
 
 .bot-message li {
     margin-bottom: 5px;
-    line-height: 1.6;
 }
 
 .bot-message strong {
@@ -111,52 +380,6 @@ h1 {
     font-weight: 600;
 }
 
-.bot-message em {
-    font-style: italic;
-    color: #555;
-}
-
-.bot-message code {
-    background: #f4f4f4;
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9em;
-}
-
-.bot-message pre {
-    background: #2d2d2d;
-    color: #f8f8f2;
-    padding: 15px;
-    border-radius: 5px;
-    overflow-x: auto;
-    margin: 10px 0;
-}
-
-.bot-message pre code {
-    background: none;
-    padding: 0;
-    color: #f8f8f2;
-}
-
-.bot-message hr {
-    border: none;
-    border-top: 2px solid #e0e0e0;
-    margin: 15px 0;
-}
-
-.bot-message a {
-    color: #667eea;
-    text-decoration: none;
-    border-bottom: 1px solid #667eea;
-}
-
-.bot-message a:hover {
-    color: #5568d3;
-    border-bottom-color: #5568d3;
-}
-
-/* Typing indicator */
 .typing-indicator {
     display: flex;
     gap: 5px;
@@ -196,11 +419,6 @@ h1 {
     font-family: inherit;
 }
 
-#userInput:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
 #sendButton {
     padding: 14px 30px;
     background: #667eea;
@@ -219,17 +437,7 @@ h1 {
     box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
 }
 
-#sendButton:active {
-    transform: translateY(0);
-}
-
-#sendButton:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* Scrollbar styling */
+/* Scrollbar */
 .chat-messages::-webkit-scrollbar {
     width: 8px;
 }
@@ -244,10 +452,6 @@ h1 {
     border-radius: 10px;
 }
 
-.chat-messages::-webkit-scrollbar-thumb:hover {
-    background: #5568d3;
-}
-
 /* Responsive */
 @media (max-width: 768px) {
     .container {
@@ -255,14 +459,19 @@ h1 {
     }
     
     h1 {
-        font-size: 1.5em;
+        font-size: 1.8em;
     }
     
-    .chat-container {
-        height: 500px;
+    .form-row {
+        grid-template-columns: 1fr;
     }
     
-    .message {
-        max-width: 90%;
+    .checkbox-group {
+        grid-template-columns: 1fr;
+    }
+    
+    .tab-button {
+        font-size: 14px;
+        padding: 12px 15px;
     }
 }

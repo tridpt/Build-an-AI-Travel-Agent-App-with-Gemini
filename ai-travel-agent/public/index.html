@@ -1,22 +1,129 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Travel Agent</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <title>AI Travel Agent - Trợ lý Du lịch Thông minh</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container">
         <h1>🌍 AI Travel Agent</h1>
-        <div class="chat-container">
-            <div id="chatMessages" class="chat-messages"></div>
-            <div class="input-container">
-                <input type="text" id="userInput" placeholder="Ask me about travel destinations, hotels, activities..." />
-                <button id="sendButton">Send</button>
+        <p class="subtitle">Trợ lý du lịch thông minh với Google Gemini</p>
+        
+        <!-- Tab Navigation -->
+        <div class="tab-container">
+            <button class="tab-button active" data-tab="form">📋 Lên Kế Hoạch</button>
+            <button class="tab-button" data-tab="chat">💬 Chat Tự Do</button>
+        </div>
+
+        <!-- Form Tab -->
+        <div id="formTab" class="tab-content active">
+            <div class="travel-form">
+                <h2>🎯 Thông tin chuyến đi của bạn</h2>
+                
+                <div class="form-group">
+                    <label for="destination">📍 Bạn muốn đi đâu?</label>
+                    <input type="text" id="destination" placeholder="Ví dụ: Đà Lạt, Phú Quốc, Tokyo..." required>
+                    <small>Có thể để trống nếu muốn AI gợi ý</small>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="startDate">📅 Ngày bắt đầu</label>
+                        <input type="date" id="startDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="endDate">📅 Ngày kết thúc</label>
+                        <input type="date" id="endDate" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="budget">💰 Ngân sách (VNĐ)</label>
+                        <input type="number" id="budget" placeholder="Ví dụ: 5000000" min="0" step="100000" required>
+                        <small id="budgetDisplay">0 VNĐ</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="travelers">👥 Số người đi</label>
+                        <input type="number" id="travelers" placeholder="Số người" min="1" max="20" value="1" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="travelStyle">🎨 Phong cách du lịch</label>
+                    <select id="travelStyle" required>
+                        <option value="">-- Chọn phong cách --</option>
+                        <option value="budget">🎒 Tiết kiệm (Backpacker)</option>
+                        <option value="comfort">🏨 Thoải mái (Khách sạn 3-4 sao)</option>
+                        <option value="luxury">✨ Cao cấp (Resort 5 sao)</option>
+                        <option value="adventure">🏔️ Phiêu lưu, Mạo hiểm</option>
+                        <option value="relax">🏖️ Nghỉ dưỡng</option>
+                        <option value="culture">🏛️ Văn hóa, Lịch sử</option>
+                        <option value="food">🍜 Ẩm thực</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="interests">❤️ Sở thích (chọn nhiều)</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" value="beach"> 🏖️ Biển</label>
+                        <label><input type="checkbox" value="mountain"> ⛰️ Núi</label>
+                        <label><input type="checkbox" value="city"> 🏙️ Thành phố</label>
+                        <label><input type="checkbox" value="nature"> 🌿 Thiên nhiên</label>
+                        <label><input type="checkbox" value="shopping"> 🛍️ Mua sắm</label>
+                        <label><input type="checkbox" value="food"> 🍽️ Ẩm thực</label>
+                        <label><input type="checkbox" value="nightlife"> 🌃 Nightlife</label>
+                        <label><input type="checkbox" value="history"> 🏛️ Lịch sử</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="transportation">🚗 Phương tiện di chuyển</label>
+                    <select id="transportation">
+                        <option value="">-- Chọn phương tiện --</option>
+                        <option value="plane">✈️ Máy bay</option>
+                        <option value="bus">🚌 Xe khách</option>
+                        <option value="train">🚄 Tàu hỏa</option>
+                        <option value="car">🚗 Xe ô tô (tự lái)</option>
+                        <option value="motorbike">🏍️ Xe máy</option>
+                        <option value="any">🤷 Tùy ý</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="additionalInfo">📝 Yêu cầu khác (tùy chọn)</label>
+                    <textarea id="additionalInfo" rows="3" placeholder="Ví dụ: Muốn ở homestay, thích chụp ảnh, đi cùng trẻ em..."></textarea>
+                </div>
+
+                <button id="generatePlanButton" class="generate-button">
+                    ✨ Tạo Lịch Trình Du Lịch
+                </button>
+            </div>
+
+            <!-- Result Display -->
+            <div id="planResult" class="plan-result" style="display: none;">
+                <div class="result-header">
+                    <h2>🎉 Lịch trình của bạn</h2>
+                    <button id="editPlanButton" class="edit-button">✏️ Chỉnh sửa</button>
+                </div>
+                <div id="planContent" class="plan-content"></div>
+            </div>
+        </div>
+
+        <!-- Chat Tab -->
+        <div id="chatTab" class="tab-content">
+            <div class="chat-container">
+                <div class="chat-messages" id="chatMessages"></div>
+                <div class="input-container">
+                    <textarea id="userInput" placeholder="Hỏi gì đó về du lịch..." rows="2"></textarea>
+                    <button id="sendButton">Gửi</button>
+                </div>
             </div>
         </div>
     </div>
-    <script src="/js/main.js"></script>
+
+    <script src="js/main.js"></script>
 </body>
 </html>
