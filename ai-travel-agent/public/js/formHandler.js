@@ -42,6 +42,7 @@ class TravelFormHandler {
     
     getFormData() {
         return {
+            startLocation: document.getElementById('startLocation').value.trim(), // Thêm dòng này
             destination: document.getElementById('destination').value.trim(),
             startDate: document.getElementById('startDate').value,
             endDate: document.getElementById('endDate').value,
@@ -96,6 +97,7 @@ class TravelFormHandler {
 **Objective:** Generate a comprehensive travel plan that is not only informative but also inspiring and easy to follow.
 
 **Here are the traveler's details:**
+* **Starting Location:** ${formData.startLocation}
 * **Destination:** ${destination}
 * **Travel Dates:** From ${formData.startDate} to ${formData.endDate} (${days} days)
 * **Travelers:** ${formData.travelers} person(s)
