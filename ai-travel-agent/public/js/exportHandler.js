@@ -27,72 +27,154 @@ class TripExporter {
     }
 
     exportToPDF() {
-        if (!this.itineraryHTML) {
-            alert(currentLang === 'vi' ? 'Chưa có lịch trình để xuất!' : 'No itinerary to export!');
-            return;
-        }
-
-        // Create a simple, clean container
-        const printWindow = document.createElement('div');
-        printWindow.innerHTML = `
-            <div style="font-family: Arial, sans-serif; padding: 30px; max-width: 800px; margin: 0 auto;">
-                <h1 style="color: #667eea; text-align: center; margin-bottom: 30px; border-bottom: 3px solid #667eea; padding-bottom: 15px;">
-                    ✈️ ${this.tripData?.destination || 'Travel'} Itinerary
-                </h1>
-                <div style="line-height: 1.8; color: #333;">
-                    ${this.cleanHTMLForExport(this.itineraryHTML)}
-                </div>
-            </div>
-            <style>
-                h1 { color: #667eea; font-size: 24px; margin: 25px 0 15px; border-bottom: 2px solid #667eea; padding-bottom: 8px; }
-                h2 { color: #667eea; font-size: 20px; margin: 20px 0 12px; border-left: 4px solid #667eea; padding-left: 12px; }
-                h3 { color: #764ba2; font-size: 18px; margin: 18px 0 10px; }
-                h4 { color: #555; font-size: 16px; margin: 15px 0 8px; }
-                p { margin: 10px 0; line-height: 1.8; }
-                ul, ol { list-style: none; margin: 12px 0; padding-left: 0; }
-                li { margin: 10px 0; padding-left: 20px; position: relative; }
-                li:before { content: "•"; color: #667eea; font-weight: bold; position: absolute; left: 0; }
-                a { color: #667eea; text-decoration: none; font-weight: 600; }
-                strong, b { color: #667eea; font-weight: 700; }
-            </style>
-        `;
-
-        // PDF configuration
-        const opt = {
-            margin: 15,
-            filename: `${this.tripData?.destination || 'trip'}_${Date.now()}.pdf`,
-            image: { type: 'jpeg', quality: 0.95 },
-            html2canvas: { 
-                scale: 2,
-                useCORS: true,
-                logging: false
-            },
-            jsPDF: { 
-                unit: 'mm', 
-                format: 'a4', 
-                orientation: 'portrait'
-            }
-        };
-
-        // Show loading
-        const exportBtn = document.getElementById('exportButton');
-        const originalText = exportBtn ? exportBtn.textContent : '';
-        if (exportBtn) exportBtn.textContent = '⏳ Đang tạo PDF...';
-
-        // Generate PDF
-        html2pdf()
-            .set(opt)
-            .from(printWindow)
-            .save()
-            .then(() => {
-                if (exportBtn) exportBtn.textContent = originalText;
-            })
-            .catch(err => {
-                console.error('PDF Error:', err);
-                alert('Lỗi khi tạo PDF. Vui lòng thử lại!');
-                if (exportBtn) exportBtn.textContent = originalText;
-            });
+    if (!this.itineraryHTML) {
+        alert(currentLang === 'vi' ? 'Chưa có lịch trình để xuất!' : 'No itinerary to export!');
+        return;
     }
+
+    // Create a simple, clean container with better page break handling
+    const printWindow = document.createElement('div');
+    printWindow.innerHTML = `
+        <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 750px; margin: 0 auto;">
+            <h1 style="color: #667eea; text-align: center; margin-bottom: 25px; border-bottom: 3px solid #667eea; padding-bottom: 15px; page-break-after: avoid;">
+                ✈️ ${this.tripData?.destination || 'Travel'} Itinerary
+            </h1>
+            <div style="line-height: 1.6; color: #333;">
+                ${this.cleanHTMLForExport(this.itineraryHTML)}
+            </div>
+        </div>
+        <style>
+            * { box-sizing: border-box; }
+            h1 { 
+                color: #667eea; 
+                font-size: 22px; 
+                margin: 20px 0 12px; 
+                border-bottom: 2px solid #667eea; 
+                padding-bottom: 8px;
+                page-break-after: avoid;
+            }
+            h2 { 
+                color: #667eea; 
+                font-size: 18px; 
+                margin: 18px 0 10px; 
+                border-left: 4px solid #667eea; 
+                padding-left: 12px;
+                page-break-after: avoid;
+            }
+            h3 { 
+                color: #764ba2; 
+                font-size: 16px; 
+                margin: 15px 0 8px;
+                page-break-after: avoid;
+            }
+            h4 { 
+                color: #555; 
+                font-size: 15px; 
+                margin: 12px 0 6px;
+                page-break-after: avoid;
+            }
+            p { 
+                margin: 8px 0; 
+                line-height: 1.6;
+                page-break-inside: avoid;
+            }
+            ul, ol { 
+                list-style: none; 
+                margin: 10px 0; 
+                padding-left: 0;
+                page-break-inside: avoid;
+            }
+            li { 
+                margin: 8px 0; 
+                padding-left: 18px; 
+                position: relative;
+                page-break-inside: avoid;
+            }
+            li:before { 
+                content: "•"; 
+                color: #667eea; 
+                font-weight: bold; 
+                position: absolute; 
+                left: 0; 
+            }
+            a { 
+                color: #667eea; 
+                text-decoration: none; 
+                font-weight: 600;
+                word-wrap: break-word;
+            }
+            strong, b { 
+                color: #667eea; 
+                font-weight: 700; 
+            }
+            
+            /* Weather sections - keep together */
+            .weather-current,
+            .weather-forecast,
+            .forecast-day {
+                page-break-inside: avoid;
+            }
+            
+            /* Prevent orphans and widows */
+            p, li {
+                orphans: 3;
+                widows: 3;
+            }
+            
+            /* Force page breaks before major sections if needed */
+            h2 {
+                page-break-before: auto;
+            }
+        </style>
+    `;
+
+    // PDF configuration with better page handling
+    const opt = {
+        margin: [12, 12, 12, 12], // top, right, bottom, left
+        filename: `${this.tripData?.destination || 'trip'}_${Date.now()}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            letterRendering: true,
+            allowTaint: true,
+            scrollY: 0,
+            scrollX: 0
+        },
+        jsPDF: { 
+            unit: 'mm', 
+            format: 'a4', 
+            orientation: 'portrait',
+            compress: true
+        },
+        pagebreak: { 
+            mode: ['avoid-all', 'css', 'legacy'],
+            before: '.page-break-before',
+            after: '.page-break-after',
+            avoid: ['h1', 'h2', 'h3', 'h4', 'p', 'li', 'ul', 'ol', '.weather-current', '.weather-forecast', '.forecast-day']
+        }
+    };
+
+    // Show loading
+    const exportBtn = document.getElementById('exportButton');
+    const originalText = exportBtn ? exportBtn.textContent : '';
+    if (exportBtn) exportBtn.textContent = '⏳ Đang tạo PDF...';
+
+    // Generate PDF
+    html2pdf()
+        .set(opt)
+        .from(printWindow)
+        .save()
+        .then(() => {
+            if (exportBtn) exportBtn.textContent = originalText;
+        })
+        .catch(err => {
+            console.error('PDF Error:', err);
+            alert('Lỗi khi tạo PDF. Vui lòng thử lại!');
+            if (exportBtn) exportBtn.textContent = originalText;
+        });
+}
 
     exportToHTML() {
         if (!this.itineraryHTML) {
