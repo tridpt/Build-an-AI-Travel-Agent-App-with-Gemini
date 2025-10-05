@@ -302,7 +302,7 @@ This project is licensed under the **MIT License** - see the LICENSE file for de
 
 **Tran Duc Tri**
 - GitHub: [@tranductri](https://github.com/tranductri)
-- Email: your.email@example.com
+- Email: tranductrist@gmail.com
 
 ## 🙏 Acknowledgments
 
