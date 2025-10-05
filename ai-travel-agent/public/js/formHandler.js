@@ -89,60 +89,77 @@ class TravelFormHandler {
     buildPrompt(formData, interests, days) {
         const lang = currentLang === 'vi' ? 'VIETNAMESE' : 'ENGLISH';
         const currency = t('currency');
-        const destination = formData.destination || 'suitable destinations';
-        
-        let prompt = `You are a professional travel consultant. Create a DETAILED travel itinerary in ${lang} with the following information:\n\n`;
-        
-        prompt += `📊 TRIP INFORMATION:\n`;
-        prompt += `- Destination: ${destination}\n`;
-        prompt += `- Duration: ${days} days (from ${formData.startDate} to ${formData.endDate})\n`;
-        prompt += `- Budget: ${formData.budget.toLocaleString()} ${currency} for ${formData.travelers} person(s)\n`;
-        prompt += `- Number of travelers: ${formData.travelers}\n`;
-        prompt += `- Travel style: ${formData.travelStyle}\n`;
-        
-        if (formData.transportation) {
-            prompt += `- Transportation: ${formData.transportation}\n`;
-        }
-        
-        if (interests.length > 0) {
-            prompt += `- Interests: ${interests.join(', ')}\n`;
-        }
-        
-        if (formData.additionalInfo) {
-            prompt += `- Additional requirements: ${formData.additionalInfo}\n`;
-        }
-        
-        prompt += `\n📝 REQUIREMENTS:\n`;
-        prompt += `1. Respond in ${lang} language\n`;
-        prompt += `2. All prices must be in ${currency}\n`;
-        prompt += `3. Create DETAILED itinerary DAY BY DAY with specific TIMES\n`;
-        prompt += `4. Suggest specific attractions with visit times\n`;
-        prompt += `5. For HOTELS: Write EXACTLY in this format:\n`;
-        prompt += `   🏨 Hotel Name | Address | Price range | Rating\n`;
-        prompt += `   Example: 🏨 Dalat Palace Hotel | 2 Tran Phu Street | 2,000,000-3,000,000 ${currency}/night | ⭐⭐⭐⭐⭐\n\n`;
-        prompt += `6. For RESTAURANTS: Write EXACTLY in this format:\n`;
-        prompt += `   🍽️ Restaurant Name | Address | Price range | Specialty\n`;
-        prompt += `   Example: 🍽️ Quan An Ngon | 138 Nam Ky Khoi Nghia | 100,000-200,000 ${currency}/person | Vietnamese cuisine\n\n`;
-        prompt += `7. Provide DETAILED COST breakdown in ${currency}:\n`;
-        prompt += `   - Transportation\n`;
-        prompt += `   - Accommodation\n`;
-        prompt += `   - Food & Dining\n`;
-        prompt += `   - Entrance fees\n`;
-        prompt += `   - Other expenses\n`;
-        prompt += `8. Show TOTAL ESTIMATED COST in ${currency} and compare with budget\n`;
-        prompt += `9. Provide useful TIPS to save money\n`;
-        prompt += `10. Include weather info and suitable clothing\n\n`;
-        
-        prompt += `IMPORTANT: \n`;
-        prompt += `- Always include the ADDRESS for hotels and restaurants\n`;
-        prompt += `- All prices MUST be in ${currency}\n`;
-        prompt += `- Respond entirely in ${lang}\n`;
-        prompt += `- Use emojis and markdown to highlight important parts\n`;
-        
+        const destination = formData.destination || 'a suitable destination based on my preferences';
+
+        let prompt = `As an expert travel agent, please create a personalized and highly detailed travel itinerary in ${lang}.
+
+**Objective:** Generate a comprehensive travel plan that is not only informative but also inspiring and easy to follow.
+
+**Here are the traveler's details:**
+* **Destination:** ${destination}
+* **Travel Dates:** From ${formData.startDate} to ${formData.endDate} (${days} days)
+* **Travelers:** ${formData.travelers} person(s)
+* **Budget:** Approximately ${formData.budget.toLocaleString()} ${currency} (total for all travelers)
+* **Travel Style:** ${formData.travelStyle}
+* **Interests:** ${interests.join(', ')}
+* **Preferred Transportation:** ${formData.transportation || 'Not specified'}
+* **Additional Notes:** ${formData.additionalInfo || 'None'}
+
+**Your task is to provide the following in your response:**
+
+**1. Overall Trip Summary:**
+* A brief, engaging overview of the trip.
+* Highlight the main experiences and themes (e.g., "A relaxing beach getaway with a touch of cultural exploration").
+* Mention the general weather conditions to expect and suggest appropriate clothing.
+
+**2. Detailed Daily Itinerary:**
+* For each day, provide a schedule from morning to night.
+* Use clear time slots (e.g., 9:00 AM - 11:00 AM).
+* For each activity, include:
+    * A captivating description.
+    * The exact location/address.
+    * Estimated time needed.
+    * Ticket prices or entry fees in ${currency}.
+    * Booking links (if applicable).
+
+**3. Accommodation Recommendations:**
+* Suggest 2-3 specific hotel/resort options that fit the travel style and budget.
+* Use this exact format for each recommendation:
+    🏨 **[Hotel Name]** | [Full Address] | [Price Range per night in ${currency}] | [Rating e.g., ⭐⭐⭐⭐⭐]
+
+**4. Dining Suggestions:**
+* Recommend a variety of restaurants for breakfast, lunch, and dinner for each day.
+* Include a mix of local specialties and diverse cuisines.
+* Use this exact format for each recommendation:
+    🍽️ **[Restaurant Name]** | [Full Address] | [Average cost per person in ${currency}] | [Cuisine/Specialty]
+
+**5. Detailed Budget Breakdown:**
+* Provide an estimated cost breakdown for the entire trip, categorized as follows:
+    * ✈️ **Transportation:** (Flights, trains, car rentals, etc.)
+    * 🏨 **Accommodation:** (Total for the trip)
+    * 🍽️ **Food & Dining:** (Daily estimate and total)
+    * 🎟️ **Activities & Entrance Fees:**
+    * 🛍️ **Shopping & Souvenirs:** (Estimate)
+    * miscellaneous**:** (Buffer)
+* Calculate the **Total Estimated Cost** in ${currency} and compare it to the traveler's budget.
+
+**6. Pro Tips & Important Information:**
+* Include practical advice for the destination (e.g., local customs, safety tips, best ways to get around).
+* Suggest money-saving hacks.
+* Provide useful phrases in the local language (if applicable).
+
+**Formatting and Language Requirements:**
+* **Language:** The entire response must be in **${lang}**.
+* **Currency:** All monetary values must be in **${currency}**.
+* **Formatting:** Use Markdown extensively for clarity and visual appeal. Use headings, bold text, bullet points, and emojis to structure the information.
+* **Tone:** Be friendly, enthusiastic, and helpful.
+
+Please begin the itinerary now.`;
+
         return prompt;
     }
     
-      async generatePlan() {
+    async generatePlan() {
         const formData = this.getFormData();
         const interests = this.getSelectedInterests();
         const days = this.validateForm(formData);
@@ -186,71 +203,68 @@ class TravelFormHandler {
     }
     
     enhanceWithBookingLinks(text, destination) {
-        // Extract hotel pattern: 🏨 Name | Address | Price | Rating
-        text = text.replace(/🏨\s*([^|\n]+)\s*\|([^|\n]*)\|([^|\n]*)\|?([^\n]*)/g, (match, name, address, price, rating) => {
-            name = name.trim();
-            address = address.trim();
-            price = price.trim();
-            rating = rating.trim();
-            
-            const bookingQuery = encodeURIComponent(`${name} ${destination || ''}`);
-            const agodaQuery = encodeURIComponent(`${name} ${destination || ''}`);
-            const mapsQuery = encodeURIComponent(`${name} ${address} ${destination || ''}`);
-            
-            const bookingLabel = currentLang === 'vi' ? 'Đặt phòng' : 'Book Now';
-            const searchLabel = currentLang === 'vi' ? 'Tìm kiếm' : 'Search';
-            
-            return `🏨 **${name}**
+    // Xử lý định dạng chi tiết cho khách sạn
+    text = text.replace(/🏨\s*([^|\n]+)\s*\|([^|\n]*)\|([^|\n]*)\|?([^\n]*)/g, (match, name, address, price, rating) => {
+        name = name.replace(/\*\*/g, '').trim();
+        address = address.trim();
+        price = price.trim();
+        rating = rating.trim();
+        const bookingQuery = encodeURIComponent(`${name} ${destination || ''}`);
+        const agodaQuery = encodeURIComponent(`${name} ${destination || ''}`);
+        const mapsQuery = encodeURIComponent(`${name} ${address} ${destination || ''}`);
+        const bookingLabel = currentLang === 'vi' ? 'Đặt phòng' : 'Book Now';
+        return `🏨 **${name}**
 📍 ${address}
 💵 ${price}
 ${rating ? '⭐ ' + rating : ''}
-
 **${bookingLabel}:**
-- [Booking.com](https://www.booking.com/search.html?ss=${bookingQuery}) 
+- [Booking.com](https://www.booking.com/search.html?ss=${bookingQuery})
 - [Agoda](https://www.agoda.com/search?city=${agodaQuery})
-- [Google Maps](https://www.google.com/maps/search/${mapsQuery})
-
+- [Google Maps](https://www.google.com/maps/search/?api=1&query=${mapsQuery})
 ---`;
-        });
-        
-        // Extract restaurant pattern: 🍽️ Name | Address | Price | Specialty
-        text = text.replace(/🍽️\s*([^|\n]+)\s*\|([^|\n]*)\|([^|\n]*)\|?([^\n]*)/g, (match, name, address, price, specialty) => {
-            name = name.trim();
-            address = address.trim();
-            price = price.trim();
-            specialty = specialty.trim();
-            
-            const mapsQuery = encodeURIComponent(`${name} ${address} ${destination || ''}`);
-            const googleQuery = encodeURIComponent(`${name} restaurant ${destination || ''}`);
-            
-            const searchLabel = currentLang === 'vi' ? 'Tìm kiếm' : 'Search';
-            
-            return `🍽️ **${name}**
+    });
+
+    // Xử lý định dạng chi tiết cho nhà hàng
+    text = text.replace(/🍽️\s*([^|\n]+)\s*\|([^|\n]*)\|([^|\n]*)\|?([^\n]*)/g, (match, name, address, price, specialty) => {
+        name = name.replace(/\*\*/g, '').trim();
+        address = address.trim();
+        price = price.trim();
+        specialty = specialty.trim();
+        const mapsQuery = encodeURIComponent(`${name} ${address} ${destination || ''}`);
+        const googleQuery = encodeURIComponent(`${name} restaurant ${destination || ''}`);
+        const searchLabel = currentLang === 'vi' ? 'Tìm kiếm' : 'Search';
+        return `🍽️ **${name}**
 📍 ${address}
 💵 ${price}
 ${specialty ? '🍴 ' + specialty : ''}
-
 **${searchLabel}:**
-- [Google Maps](https://www.google.com/maps/search/${mapsQuery})
+- [Google Maps](https://www.google.com/maps/search/?api=1&query=${mapsQuery})
 - [Google Search](https://www.google.com/search?q=${googleQuery})
-
 ---`;
-        });
-        
-        // Handle simple hotel mentions
-        text = text.replace(/🏨\s*([^\n]+?)(?=\n|$)/g, (match, hotelInfo) => {
-            const searchQuery = encodeURIComponent(hotelInfo.trim() + ' ' + (destination || ''));
-            return `🏨 ${hotelInfo.trim()} - [Booking.com](https://www.booking.com/search.html?ss=${searchQuery}) | [Agoda](https://www.agoda.com/search?city=${searchQuery})`;
-        });
-        
-        // Handle simple restaurant mentions
-        text = text.replace(/🍽️\s*([^\n]+?)(?=\n|$)/g, (match, restaurantInfo) => {
-            const searchQuery = encodeURIComponent(restaurantInfo.trim() + ' ' + (destination || ''));
-            return `🍽️ ${restaurantInfo.trim()} - [Google Maps](https://www.google.com/maps/search/${searchQuery})`;
-        });
-        
-        return text;
-    }
+    });
+
+    // Xử lý các dòng khách sạn đơn giản
+    text = text.replace(/^🏨\s*([^|\n\[\]]+)$/gm, (match, hotelInfo) => {
+        const cleanHotelInfo = hotelInfo.trim();
+        const searchQuery = encodeURIComponent(cleanHotelInfo + ' ' + (destination || ''));
+        return `🏨 ${cleanHotelInfo}
+- [Booking.com](https://www.booking.com/search.html?ss=${searchQuery})
+- [Agoda](https://www.agoda.com/search?city=${searchQuery})
+- [Google Maps](https://www.google.com/maps/search/?api=1&query=${searchQuery})`;
+    });
+
+    // Xử lý các dòng nhà hàng/địa điểm đơn giản
+    text = text.replace(/^🍽️\s*([^|\n\[\]]+)$/gm, (match, restaurantInfo) => {
+        const cleanRestaurantInfo = restaurantInfo.trim();
+        const mapsQuery = encodeURIComponent(cleanRestaurantInfo + ' ' + (destination || ''));
+        const googleQuery = encodeURIComponent(cleanRestaurantInfo + ' restaurant ' + (destination || ''));
+        return `🍽️ ${cleanRestaurantInfo}
+- [Google Maps](https://www.google.com/maps/search/?api=1&query=${mapsQuery})
+- [Google Search](https://www.google.com/search?q=${googleQuery})`;
+    });
+
+    return text;
+}
     
     editPlan() {
         this.planResult.style.display = 'none';

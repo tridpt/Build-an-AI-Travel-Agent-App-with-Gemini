@@ -153,5 +153,13 @@
     <script src="js/exportHandler.js"></script>
     <script src="js/main.js"></script>
     <script src="js/formHandler.js"></script>
+    <script src="js/weatherWidget.js"></script>
+    <script>
+        // Display weather when destination is selected
+        document.addEventListener('DOMContentLoaded', () => {
+            // Example: Show weather for a destination
+            weatherWidget.displayWeather('Hanoi, Vietnam', 'weather-container');
+        });
+    </script>
 </body>
 </html>
