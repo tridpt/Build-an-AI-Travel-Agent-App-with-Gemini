@@ -10,8 +10,8 @@ export async function getTravelRecommendations(userMessage: string): Promise<str
     console.log('Sending request to Gemini with message:', userMessage);
     console.log('API Key exists:', !!process.env.GEMINI_API_KEY);
     
-    // Thử với gemini-1.0-pro (model cũ hơn, ổn định hơn)
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.0-pro' });
+    // Sử dụng Gemini 2.5 Flash (model mới nhất và miễn phí)
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     
     const prompt = `You are a helpful travel agent assistant. Provide detailed travel recommendations, including destinations, activities, accommodations, and budget estimates. You can respond in Vietnamese if the user asks in Vietnamese.
 
