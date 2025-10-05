@@ -15,7 +15,11 @@ class TravelFormHandler {
         // Budget formatting
         this.budgetInput.addEventListener('input', (e) => {
             const value = parseInt(e.target.value) || 0;
-            this.budgetDisplay.textContent = value.toLocaleString(currentLang === 'vi' ? 'vi-VN' : 'en-US') + ' ' + t('currency');
+            if (currentLang === 'vi') {
+                this.budgetDisplay.textContent = value.toLocaleString('vi-VN') + ' ' + t('currency');
+            } else {
+                this.budgetDisplay.textContent = t('currencySymbol') + value.toLocaleString('en-US');
+            }
         });
         
         // Date validation
@@ -83,15 +87,16 @@ class TravelFormHandler {
     }
     
     buildPrompt(formData, interests, days) {
-        const lang = currentLang === 'vi' ? 'TIẾNG VIỆT' : 'ENGLISH';
+        const lang = currentLang === 'vi' ? 'VIETNAMESE' : 'ENGLISH';
+        const currency = t('currency');
         const destination = formData.destination || 'suitable destinations';
         
-        let prompt = `You are a professional travel consultant. Create a DETAILED travel itinerary with the following information:\n\n`;
+        let prompt = `You are a professional travel consultant. Create a DETAILED travel itinerary in ${lang} with the following information:\n\n`;
         
         prompt += `📊 TRIP INFORMATION:\n`;
         prompt += `- Destination: ${destination}\n`;
         prompt += `- Duration: ${days} days (from ${formData.startDate} to ${formData.endDate})\n`;
-        prompt += `- Budget: ${formData.budget.toLocaleString()} ${currentLang === 'vi' ? 'VNĐ' : 'USD'} for ${formData.travelers} person(s)\n`;
+        prompt += `- Budget: ${formData.budget.toLocaleString()} ${currency} for ${formData.travelers} person(s)\n`;
         prompt += `- Number of travelers: ${formData.travelers}\n`;
         prompt += `- Travel style: ${formData.travelStyle}\n`;
         
@@ -108,32 +113,36 @@ class TravelFormHandler {
         }
         
         prompt += `\n📝 REQUIREMENTS:\n`;
-        prompt += `1. Create DETAILED itinerary DAY BY DAY with specific TIMES\n`;
-        prompt += `2. Suggest specific attractions with visit times\n`;
-        prompt += `3. For HOTELS: Write EXACTLY in this format:\n`;
+        prompt += `1. Respond in ${lang} language\n`;
+        prompt += `2. All prices must be in ${currency}\n`;
+        prompt += `3. Create DETAILED itinerary DAY BY DAY with specific TIMES\n`;
+        prompt += `4. Suggest specific attractions with visit times\n`;
+        prompt += `5. For HOTELS: Write EXACTLY in this format:\n`;
         prompt += `   🏨 Hotel Name | Address | Price range | Rating\n`;
-        prompt += `   Example: 🏨 Dalat Palace Hotel | 2 Tran Phu Street | 2,000,000-3,000,000 VND/night | ⭐⭐⭐⭐⭐\n\n`;
-        prompt += `4. For RESTAURANTS: Write EXACTLY in this format:\n`;
+        prompt += `   Example: 🏨 Dalat Palace Hotel | 2 Tran Phu Street | 2,000,000-3,000,000 ${currency}/night | ⭐⭐⭐⭐⭐\n\n`;
+        prompt += `6. For RESTAURANTS: Write EXACTLY in this format:\n`;
         prompt += `   🍽️ Restaurant Name | Address | Price range | Specialty\n`;
-        prompt += `   Example: 🍽️ Quan An Ngon | 138 Nam Ky Khoi Nghia | 100,000-200,000 VND/person | Vietnamese cuisine\n\n`;
-        prompt += `5. Provide DETAILED COST breakdown:\n`;
+        prompt += `   Example: 🍽️ Quan An Ngon | 138 Nam Ky Khoi Nghia | 100,000-200,000 ${currency}/person | Vietnamese cuisine\n\n`;
+        prompt += `7. Provide DETAILED COST breakdown in ${currency}:\n`;
         prompt += `   - Transportation\n`;
         prompt += `   - Accommodation\n`;
         prompt += `   - Food & Dining\n`;
         prompt += `   - Entrance fees\n`;
         prompt += `   - Other expenses\n`;
-        prompt += `6. Show TOTAL ESTIMATED COST and compare with budget\n`;
-        prompt += `7. Provide useful TIPS to save money\n`;
-        prompt += `8. Include weather info and suitable clothing\n\n`;
+        prompt += `8. Show TOTAL ESTIMATED COST in ${currency} and compare with budget\n`;
+        prompt += `9. Provide useful TIPS to save money\n`;
+        prompt += `10. Include weather info and suitable clothing\n\n`;
         
-        prompt += `IMPORTANT: Always include the ADDRESS for hotels and restaurants so I can create booking/map links.\n\n`;
-        
-        prompt += `Please respond in ${lang} with beautiful formatting. Use emojis and markdown to highlight important parts.`;
+        prompt += `IMPORTANT: \n`;
+        prompt += `- Always include the ADDRESS for hotels and restaurants\n`;
+        prompt += `- All prices MUST be in ${currency}\n`;
+        prompt += `- Respond entirely in ${lang}\n`;
+        prompt += `- Use emojis and markdown to highlight important parts\n`;
         
         return prompt;
     }
     
-    async generatePlan() {
+      async generatePlan() {
         const formData = this.getFormData();
         const interests = this.getSelectedInterests();
         const days = this.validateForm(formData);
@@ -157,11 +166,13 @@ class TravelFormHandler {
             const data = await response.json();
             
             if (data.response) {
-                // Add booking links enhancement
                 const enhancedResponse = this.enhanceWithBookingLinks(data.response, formData.destination);
                 this.planContent.innerHTML = markdownToHtml(enhancedResponse);
                 this.planResult.style.display = 'block';
                 this.planResult.scrollIntoView({ behavior: 'smooth' });
+                
+                // Save trip data for export
+                tripExporter.setTripData(formData, this.planContent.innerHTML);
             } else {
                 alert(t('errorPlan'));
             }
@@ -182,17 +193,19 @@ class TravelFormHandler {
             price = price.trim();
             rating = rating.trim();
             
-            // Create search queries
             const bookingQuery = encodeURIComponent(`${name} ${destination || ''}`);
             const agodaQuery = encodeURIComponent(`${name} ${destination || ''}`);
             const mapsQuery = encodeURIComponent(`${name} ${address} ${destination || ''}`);
+            
+            const bookingLabel = currentLang === 'vi' ? 'Đặt phòng' : 'Book Now';
+            const searchLabel = currentLang === 'vi' ? 'Tìm kiếm' : 'Search';
             
             return `🏨 **${name}**
 📍 ${address}
 💵 ${price}
 ${rating ? '⭐ ' + rating : ''}
 
-**Đặt phòng:**
+**${bookingLabel}:**
 - [Booking.com](https://www.booking.com/search.html?ss=${bookingQuery}) 
 - [Agoda](https://www.agoda.com/search?city=${agodaQuery})
 - [Google Maps](https://www.google.com/maps/search/${mapsQuery})
@@ -207,29 +220,30 @@ ${rating ? '⭐ ' + rating : ''}
             price = price.trim();
             specialty = specialty.trim();
             
-            // Create search queries
             const mapsQuery = encodeURIComponent(`${name} ${address} ${destination || ''}`);
             const googleQuery = encodeURIComponent(`${name} restaurant ${destination || ''}`);
+            
+            const searchLabel = currentLang === 'vi' ? 'Tìm kiếm' : 'Search';
             
             return `🍽️ **${name}**
 📍 ${address}
 💵 ${price}
 ${specialty ? '🍴 ' + specialty : ''}
 
-**Tìm kiếm:**
+**${searchLabel}:**
 - [Google Maps](https://www.google.com/maps/search/${mapsQuery})
 - [Google Search](https://www.google.com/search?q=${googleQuery})
 
 ---`;
         });
         
-        // Also handle simple hotel mentions
+        // Handle simple hotel mentions
         text = text.replace(/🏨\s*([^\n]+?)(?=\n|$)/g, (match, hotelInfo) => {
             const searchQuery = encodeURIComponent(hotelInfo.trim() + ' ' + (destination || ''));
             return `🏨 ${hotelInfo.trim()} - [Booking.com](https://www.booking.com/search.html?ss=${searchQuery}) | [Agoda](https://www.agoda.com/search?city=${searchQuery})`;
         });
         
-        // Also handle simple restaurant mentions
+        // Handle simple restaurant mentions
         text = text.replace(/🍽️\s*([^\n]+?)(?=\n|$)/g, (match, restaurantInfo) => {
             const searchQuery = encodeURIComponent(restaurantInfo.trim() + ' ' + (destination || ''));
             return `🍽️ ${restaurantInfo.trim()} - [Google Maps](https://www.google.com/maps/search/${searchQuery})`;

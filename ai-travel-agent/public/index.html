@@ -78,14 +78,14 @@
                 <div class="form-group">
                     <label data-i18n="interests">❤️ Sở thích (chọn nhiều)</label>
                     <div class="checkbox-group">
-                        <label><input type="checkbox" value="beach"> <span data-i18n="interestBeach">🏖️ Biển</span></label>
-                        <label><input type="checkbox" value="mountain"> <span data-i18n="interestMountain">⛰️ Núi</span></label>
-                        <label><input type="checkbox" value="city"> <span data-i18n="interestCity">🏙️ Thành phố</span></label>
-                        <label><input type="checkbox" value="nature"> <span data-i18n="interestNature">🌿 Thiên nhiên</span></label>
-                        <label><input type="checkbox" value="shopping"> <span data-i18n="interestShopping">🛍️ Mua sắm</span></label>
-                        <label><input type="checkbox" value="food"> <span data-i18n="interestFood">🍽️ Ẩm thực</span></label>
-                        <label><input type="checkbox" value="nightlife"> <span data-i18n="interestNightlife">🌃 Nightlife</span></label>
-                        <label><input type="checkbox" value="history"> <span data-i18n="interestHistory">🏛️ Lịch sử</span></label>
+                        <label><input type="checkbox" value="beach"> <span>🏖️ Biển</span></label>
+                        <label><input type="checkbox" value="mountain"> <span>⛰️ Núi</span></label>
+                        <label><input type="checkbox" value="city"> <span>🏙️ Thành phố</span></label>
+                        <label><input type="checkbox" value="nature"> <span>🌿 Thiên nhiên</span></label>
+                        <label><input type="checkbox" value="shopping"> <span>🛍️ Mua sắm</span></label>
+                        <label><input type="checkbox" value="food"> <span>🍽️ Ẩm thực</span></label>
+                        <label><input type="checkbox" value="nightlife"> <span>🌃 Nightlife</span></label>
+                        <label><input type="checkbox" value="history"> <span>🏛️ Lịch sử</span></label>
                     </div>
                 </div>
 
@@ -116,7 +116,21 @@
             <div id="planResult" class="plan-result" style="display: none;">
                 <div class="result-header">
                     <h2 data-i18n="resultTitle">🎉 Lịch trình của bạn</h2>
-                    <button id="editPlanButton" class="edit-button" data-i18n="editButton">✏️ Chỉnh sửa</button>
+                    <div class="result-actions">
+                        <!-- Export Dropdown -->
+                        <div class="export-dropdown">
+                            <button class="export-button" id="exportButton">
+                                📥 <span data-i18n="exportButton">Xuất File</span> ▼
+                            </button>
+                            <div class="export-menu" id="exportMenu">
+                                <button onclick="tripExporter.exportToPDF()">📄 PDF</button>
+                                <button onclick="tripExporter.exportToHTML()">🌐 HTML</button>
+                                <button onclick="tripExporter.exportToMarkdown()">📝 Markdown</button>
+                                <button onclick="tripExporter.exportToText()">📃 Text</button>
+                            </div>
+                        </div>
+                        <button id="editPlanButton" class="edit-button" data-i18n="editButton">✏️ Chỉnh sửa</button>
+                    </div>
                 </div>
                 <div id="planContent" class="plan-content"></div>
             </div>
@@ -136,6 +150,7 @@
 
     <!-- Load scripts in order -->
     <script src="js/translations.js"></script>
+    <script src="js/exportHandler.js"></script>
     <script src="js/main.js"></script>
     <script src="js/formHandler.js"></script>
 </body>

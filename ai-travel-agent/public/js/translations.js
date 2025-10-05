@@ -13,6 +13,7 @@ const translations = {
         budget: '💰 Ngân sách',
         budgetPlaceholder: 'Ví dụ: 5000000',
         currency: 'VNĐ',
+        currencySymbol: 'VNĐ',
         travelers: '👥 Số người đi',
         travelersPlaceholder: 'Số người',
         travelStyle: '🎨 Phong cách du lịch',
@@ -45,6 +46,7 @@ const translations = {
         additionalPlaceholder: 'Ví dụ: Muốn ở homestay, thích chụp ảnh, đi cùng trẻ em...',
         generateButton: '✨ Tạo Lịch Trình Du Lịch',
         generating: '⏳ Đang tạo lịch trình...',
+        exportButton: 'Xuất File',
         resultTitle: '🎉 Lịch trình của bạn',
         editButton: '✏️ Chỉnh sửa',
         chatPlaceholder: 'Hỏi gì đó về du lịch...',
@@ -71,6 +73,7 @@ const translations = {
         budget: '💰 Budget',
         budgetPlaceholder: 'e.g., 500',
         currency: 'USD',
+        currencySymbol: '$',
         travelers: '👥 Number of Travelers',
         travelersPlaceholder: 'Number',
         travelStyle: '🎨 Travel Style',
@@ -103,6 +106,7 @@ const translations = {
         additionalPlaceholder: 'e.g., Prefer homestays, love photography, traveling with kids...',
         generateButton: '✨ Generate Travel Plan',
         generating: '⏳ Generating plan...',
+        exportButton: 'Export File',
         resultTitle: '🎉 Your Itinerary',
         editButton: '✏️ Edit',
         chatPlaceholder: 'Ask something about travel...',
@@ -126,10 +130,21 @@ function t(key) {
 function switchLanguage(lang) {
     currentLang = lang;
     updateUIText();
+    updateBudgetDisplay();
+    updateWelcomeMessage();
+    
+    // Update active language button
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.getElementById(`lang-${lang}`).classList.add('active');
+    
+    // Save preference
     localStorage.setItem('preferredLanguage', lang);
 }
 
 function updateUIText() {
+    // Update text elements
     document.querySelectorAll('[data-i18n]').forEach(elem => {
         const key = elem.getAttribute('data-i18n');
         if (elem.tagName === 'INPUT' || elem.tagName === 'TEXTAREA') {
@@ -138,9 +153,84 @@ function updateUIText() {
             elem.textContent = t(key);
         }
     });
+    
+    // Update select options
+    const travelStyleSelect = document.getElementById('travelStyle');
+    if (travelStyleSelect) {
+        const selectedValue = travelStyleSelect.value;
+        travelStyleSelect.innerHTML = `
+            <option value="">${t('selectStyle')}</option>
+            <option value="budget">${t('styleBudget')}</option>
+            <option value="comfort">${t('styleComfort')}</option>
+            <option value="luxury">${t('styleLuxury')}</option>
+            <option value="adventure">${t('styleAdventure')}</option>
+            <option value="relax">${t('styleRelax')}</option>
+            <option value="culture">${t('styleCulture')}</option>
+            <option value="food">${t('styleFood')}</option>
+        `;
+        travelStyleSelect.value = selectedValue;
+    }
+    
+    const transportSelect = document.getElementById('transportation');
+    if (transportSelect) {
+        const selectedValue = transportSelect.value;
+        transportSelect.innerHTML = `
+            <option value="">${t('selectTransport')}</option>
+            <option value="plane">${t('transportPlane')}</option>
+            <option value="bus">${t('transportBus')}</option>
+            <option value="train">${t('transportTrain')}</option>
+            <option value="car">${t('transportCar')}</option>
+            <option value="motorbike">${t('transportMotorbike')}</option>
+            <option value="any">${t('transportAny')}</option>
+        `;
+        transportSelect.value = selectedValue;
+    }
+    
+    // Update checkbox labels
+    const checkboxes = [
+        { value: 'beach', key: 'interestBeach' },
+        { value: 'mountain', key: 'interestMountain' },
+        { value: 'city', key: 'interestCity' },
+        { value: 'nature', key: 'interestNature' },
+        { value: 'shopping', key: 'interestShopping' },
+        { value: 'food', key: 'interestFood' },
+        { value: 'nightlife', key: 'interestNightlife' },
+        { value: 'history', key: 'interestHistory' }
+    ];
+    
+    checkboxes.forEach(({ value, key }) => {
+        const checkbox = document.querySelector(`input[type="checkbox"][value="${value}"]`);
+        if (checkbox && checkbox.nextElementSibling) {
+            checkbox.nextElementSibling.textContent = t(key);
+        }
+    });
 }
 
-// Load saved language
+function updateBudgetDisplay() {
+    const budgetInput = document.getElementById('budget');
+    const budgetDisplay = document.getElementById('budgetDisplay');
+    if (budgetInput && budgetDisplay) {
+        const value = parseInt(budgetInput.value) || 0;
+        if (currentLang === 'vi') {
+            budgetDisplay.textContent = value.toLocaleString('vi-VN') + ' ' + t('currency');
+        } else {
+            budgetDisplay.textContent = t('currencySymbol') + value.toLocaleString('en-US');
+        }
+    }
+}
+
+function updateWelcomeMessage() {
+    // Update welcome message in chat
+    const chatMessages = document.getElementById('chatMessages');
+    if (chatMessages && chatMessages.children.length > 0) {
+        const firstMessage = chatMessages.children[0];
+        if (firstMessage.classList.contains('bot-message')) {
+            firstMessage.textContent = t('welcomeMessage');
+        }
+    }
+}
+
+// Load saved language on page load
 document.addEventListener('DOMContentLoaded', () => {
     const savedLang = localStorage.getItem('preferredLanguage') || 'vi';
     switchLanguage(savedLang);

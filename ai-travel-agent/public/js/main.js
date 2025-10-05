@@ -122,5 +122,20 @@ userInput.addEventListener('keypress', (e) => {
 
 // Welcome message
 document.addEventListener('DOMContentLoaded', () => {
-    addMessage(t('welcomeMessage'), false);
+    const exportButton = document.getElementById('exportButton');
+    const exportMenu = document.getElementById('exportMenu');
+    
+    if (exportButton && exportMenu) {
+        exportButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            exportMenu.classList.toggle('show');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!exportButton.contains(e.target) && !exportMenu.contains(e.target)) {
+                exportMenu.classList.remove('show');
+            }
+        });
+    }
 });
