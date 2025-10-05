@@ -475,3 +475,100 @@ small {
         padding: 12px 15px;
     }
 }
+
+/* Booking Links */
+.booking-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white !important;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+    margin: 0 4px;
+}
+
+.booking-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.bot-message a.booking-link {
+    border-bottom: none;
+}
+
+
+/* Language Switcher */
+.language-switcher {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    display: flex;
+    gap: 10px;
+}
+
+.lang-btn {
+    padding: 8px 15px;
+    background: white;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.lang-btn:hover {
+    border-color: #667eea;
+    background: #f0f3ff;
+}
+
+.lang-btn.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+/* Booking Links Enhancement */
+.plan-content a {
+    display: inline-block;
+    padding: 6px 12px;
+    margin: 5px 5px 5px 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white !important;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s;
+    border: none !important;
+}
+
+.plan-content a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+    background: linear-gradient(135deg, #5568d3 0%, #653a8a 100%);
+}
+
+.plan-content a::after {
+    content: " 🔗";
+}
+
+/* Hotel and Restaurant Cards */
+.plan-content hr {
+    margin: 20px 0;
+    border: none;
+    border-top: 1px dashed #e0e0e0;
+}
+
+/* Make booking sections stand out */
+.plan-content strong:contains("Đặt phòng"),
+.plan-content strong:contains("Tìm kiếm") {
+    color: #667eea;
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
