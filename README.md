@@ -301,7 +301,7 @@ This project is licensed under the **MIT License** - see the LICENSE file for de
 ## 👤 Author
 
 **Tran Duc Tri**
-- GitHub: [@tranductri](https://github.com/tranductri)
+- GitHub: [@tridpt](https://github.com/tridpt)
 - Email: tranductrist@gmail.com
 
 ## 🙏 Acknowledgments
