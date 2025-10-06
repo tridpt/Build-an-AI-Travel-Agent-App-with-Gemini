@@ -320,7 +320,7 @@ This project is licensed under the **MIT License** - see the LICENSE file for de
 - [ ] Trip collaboration (shared planning)
 - [ ] Mobile app (React Native)
 - [x] Weather API integration
-- [ ] Currency conversion API
+- [x] Currency conversion API
 - [ ] Map view of itinerary
 - [ ] Calendar export (iCal format)
 

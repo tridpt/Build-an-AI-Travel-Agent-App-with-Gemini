@@ -6,6 +6,7 @@ import multer from 'multer';
 import { GeminiService, generateFreeChat } from './services/geminiService';
 import { WeatherService } from './services/weatherService';
 import { Content, Part } from '@google/generative-ai'; // Quan trọng: import thêm Part
+import { CurrencyService } from './services/currencyService';
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 const geminiService = new GeminiService();
 const weatherService = new WeatherService();
+const currencyService = new CurrencyService();
 
 // Lưu trữ lịch sử chat (sẽ reset khi server khởi động lại)
 let chatHistory: Content[] = [];
@@ -116,6 +118,34 @@ app.get('/api/weather/forecast/:city', async (req: Request, res: Response) => {
   }
 });
 
+app.get('/api/currency/exchange', async (req: Request, res: Response) => {
+  try {
+    const { source, target } = req.query;
+
+    if (!source || !target) {
+      return res.status(400).json({ error: 'Source and target currencies are required' });
+    }
+
+    const rate = await currencyService.getConversionRate(source as string, target as string);
+
+    if (rate === null) {
+      return res.status(503).json({
+        error: 'Currency conversion service unavailable',
+        message: 'Could not fetch the conversion rate. Please check your API key.'
+      });
+    }
+
+    res.json({ rate });
+
+  } catch (error: any) {
+    console.error('Currency API error:', error);
+    res.status(500).json({
+      error: 'Failed to fetch currency conversion data',
+      details: error.message
+    });
+  }
+});
+
 app.get('/', (req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
@@ -124,3 +154,4 @@ app.listen(port, () => {
   console.log(`🚀 Server is running on http://localhost:${port}`);
   console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
 });
+

@@ -1035,3 +1035,48 @@ small {
     background: #f0f3ff;
     color: #34a853;
 }
+
+.tab-button {
+    /* ... các thuộc tính cũ ... */
+    text-align: center;
+    text-decoration: none;
+}
+
+.currency-converter-container {
+    background: #f8f9fa;
+    padding: 20px 30px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #e0e0e0;
+}
+
+.currency-converter-container h2 {
+    text-align: center;
+    color: #667eea;
+    margin-bottom: 25px;
+    font-size: 1.8em;
+}
+
+.currency-converter {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto;
+    gap: 15px;
+    align-items: flex-end;
+}
+
+.currency-converter .form-group {
+    margin-bottom: 0;
+}
+
+.conversion-result {
+    margin-top: 20px;
+    padding: 15px;
+    text-align: center;
+    font-size: 1.25em;
+    font-weight: 600;
+    color: #667eea;
+    min-height: 30px;
+    background: #f0f3ff;
+    border-radius: 8px;
+    border: 1px solid #dbe1ff;
+}
