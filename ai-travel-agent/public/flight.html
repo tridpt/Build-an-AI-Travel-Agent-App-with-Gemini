@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tìm chuyến bay - AI Travel Agent</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="language-switcher">
+            <button onclick="switchLanguage('vi')" class="lang-btn active" id="lang-vi">🇻🇳 VI</button>
+            <button onclick="switchLanguage('en')" class="lang-btn" id="lang-en">🇬🇧 EN</button>
+        </div>
+
+        <h1>🌍 AI Travel Agent</h1>
+        
+        <div style="text-align: center; margin-bottom: 20px;">
+            <a href="/" class="tab-button" style="text-decoration: none; display: inline-block; border-bottom: none;">⬅️ Quay về Trang chủ</a>
+        </div>
+
+        <div class="travel-form">
+            <h2>✈️ Tìm kiếm chuyến bay</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fromAirport">Sân bay đi (IATA)</label>
+                    <input type="text" id="fromAirport" placeholder="Ví dụ: SGN">
+                </div>
+                <div class="form-group">
+                    <label for="toAirport">Sân bay đến (IATA)</label>
+                    <input type="text" id="toAirport" placeholder="Ví dụ: HAN">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="flightDate">Ngày bay</label>
+                <input type="date" id="flightDate">
+            </div>
+            <button id="searchFlightButton" class="generate-button">Tìm kiếm</button>
+        </div>
+
+        <div id="flightResults" class="plan-result" style="display: none;">
+            <h2>Kết quả tìm kiếm</h2>
+            <div id="flightResultsContent" class="plan-content"></div>
+        </div>
+    </div>
+
+    <script src="js/translations.js"></script>
+    <script src="js/flightHandler.js"></script>
+</body>
+</html>

@@ -313,7 +313,7 @@ This project is licensed under the **MIT License** - see the LICENSE file for de
 
 ## 🔮 Future Enhancements
 
-- [ ] Flight search integration
+- [x] Flight search integration
 - [ ] Price comparison across multiple booking sites
 - [ ] User authentication and saved trips
 - [x] Social sharing features

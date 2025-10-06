@@ -7,6 +7,7 @@ import { GeminiService, generateFreeChat } from './services/geminiService';
 import { WeatherService } from './services/weatherService';
 import { Content, Part } from '@google/generative-ai'; // Quan trọng: import thêm Part
 import { CurrencyService } from './services/currencyService';
+import { FlightService } from './services/flightService';
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 const geminiService = new GeminiService();
 const weatherService = new WeatherService();
 const currencyService = new CurrencyService();
+const flightService = new FlightService();
 
 // Lưu trữ lịch sử chat (sẽ reset khi server khởi động lại)
 let chatHistory: Content[] = [];
@@ -141,6 +143,27 @@ app.get('/api/currency/exchange', async (req: Request, res: Response) => {
     console.error('Currency API error:', error);
     res.status(500).json({
       error: 'Failed to fetch currency conversion data',
+      details: error.message
+    });
+  }
+});
+
+app.get('/api/flights/search', async (req: Request, res: Response) => {
+  try {
+    // SỬA LỖI: Đổi tên tham số để khớp với API
+    const { airport1, airport2, date } = req.query;
+
+    if (!airport1 || !airport2 || !date) {
+      return res.status(400).json({ error: 'Airport1, Airport2, and Date are required' });
+    }
+
+    const flights = await flightService.searchFlights(airport1 as string, airport2 as string, date as string);
+    res.json({ flights });
+
+  } catch (error: any) {
+    console.error('Flight search API error:', error);
+    res.status(500).json({
+      error: 'Failed to fetch flight data',
       details: error.message
     });
   }
