@@ -4,6 +4,9 @@ const tabContents = document.querySelectorAll('.tab-content');
 
 tabButtons.forEach(button => {
     button.addEventListener('click', () => {
+        // Bỏ qua nếu là link chuyển trang, không phải tab
+        if (button.hasAttribute('href')) return;
+
         const tabName = button.dataset.tab;
         
         tabButtons.forEach(btn => btn.classList.remove('active'));
@@ -55,26 +58,33 @@ const imagePreview = document.getElementById('imagePreview');
 const removeImageButton = document.getElementById('removeImageButton');
 let selectedImageFile = null;
 
-attachButton.addEventListener('click', () => imageInput.click());
+if (attachButton) {
+    attachButton.addEventListener('click', () => imageInput.click());
+}
 
-imageInput.addEventListener('change', () => {
-    const file = imageInput.files[0];
-    if (file) {
-        selectedImageFile = file;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            imagePreview.src = e.target.result;
-            imagePreviewContainer.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-    }
-});
+if (imageInput) {
+    imageInput.addEventListener('change', () => {
+        const file = imageInput.files[0];
+        if (file) {
+            selectedImageFile = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.src = e.target.result;
+                imagePreviewContainer.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+}
 
-removeImageButton.addEventListener('click', () => {
-    selectedImageFile = null;
-    imageInput.value = '';
-    imagePreviewContainer.style.display = 'none';
-});
+if (removeImageButton) {
+    removeImageButton.addEventListener('click', () => {
+        selectedImageFile = null;
+        imageInput.value = '';
+        imagePreviewContainer.style.display = 'none';
+    });
+}
+
 
 function addMessage(message, isUser) {
     const messageDiv = document.createElement('div');
@@ -116,7 +126,6 @@ function removeLoading() {
     if (loading) loading.remove();
 }
 
-// TÁCH RA HÀM RIÊNG ĐỂ XỬ LÝ GỌI API VÀ HIỂN THỊ KẾT QUẢ
 async function getApiResponse(formData) {
     showLoading();
     try {
@@ -141,62 +150,62 @@ async function getApiResponse(formData) {
     }
 }
 
-// CẬP NHẬT LẠI HÀM SENDMESSAGE
 async function sendMessage() {
     const message = userInput.value.trim();
     const imageFile = selectedImageFile;
 
     if (!message && !imageFile) return;
 
-    // Hiển thị tin nhắn văn bản (nếu có)
     if (message) {
         addMessage(message, true);
     }
     
-    // Reset các ô input ngay lập tức
     userInput.value = '';
     sendButton.disabled = true;
-    removeImageButton.click(); // Thao tác này cũng sẽ reset selectedImageFile = null
+    removeImageButton.click();
 
-    // Chuẩn bị dữ liệu để gửi đi
     const formData = new FormData();
     formData.append('message', message);
     if (imageFile) {
         formData.append('image', imageFile);
     }
     
-    // Xử lý hiển thị và gọi API theo đúng thứ tự
     if (imageFile) {
         const reader = new FileReader();
         reader.onload = (e) => {
-            // 1. Hiển thị ảnh của người dùng
             const imgElement = document.createElement('img');
             imgElement.src = e.target.result;
             imgElement.style.maxWidth = '200px';
             imgElement.style.borderRadius = '10px';
             addMessageElement(imgElement, true);
-
-            // 2. SAU KHI ảnh đã hiển thị, mới gọi API và hiển thị "loading"
             getApiResponse(formData);
         };
         reader.readAsDataURL(imageFile);
     } else {
-        // Nếu chỉ có văn bản, gọi API và hiển thị "loading" luôn
         getApiResponse(formData);
     }
 }
 
+if (sendButton) {
+    sendButton.addEventListener('click', sendMessage);
+}
 
-sendButton.addEventListener('click', sendMessage);
+if (userInput) {
+    userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+}
 
-userInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
-    }
-});
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Thêm tin nhắn chào mừng vào khung chat
+    if (chatMessages && chatMessages.children.length === 0) {
+        addMessage(t('welcomeMessage'), false);
+    }
+
     const exportButton = document.getElementById('exportButton');
     const exportMenu = document.getElementById('exportMenu');
     if (exportButton && exportMenu) {
@@ -204,12 +213,8 @@ document.addEventListener('DOMContentLoaded', () => {
             e.stopPropagation();
             exportMenu.classList.toggle('show');
         });
-        document.addEventListener('click', (e) => {
-            if (!exportButton.contains(e.targeget) && !exportMenu.contains(e.target)) {
-                exportMenu.classList.remove('show');
-            }
-        });
     }
+
     const shareButton = document.getElementById('shareButton');
     const shareMenu = document.getElementById('shareMenu');
     if (shareButton && shareMenu) {
@@ -219,11 +224,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Lắng nghe click toàn cục để đóng menu
     document.addEventListener('click', (e) => {
         if (exportMenu && !exportButton.contains(e.target) && !exportMenu.contains(e.target)) {
             exportMenu.classList.remove('show');
         }
-        // THÊM MỚI: Ẩn menu chia sẻ khi click ra ngoài
         if (shareMenu && !shareButton.contains(e.target) && !shareMenu.contains(e.target)) {
             shareMenu.classList.remove('show');
         }

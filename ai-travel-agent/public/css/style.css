@@ -374,12 +374,25 @@ small {
 .bot-message h3 { font-size: 1.3em; }
 
 .bot-message ul, .bot-message ol {
-    margin-left: 20px;
+    list-style: none; /* Tắt đánh số và dấu chấm mặc định */
+    padding-left: 0;   /* Xóa khoảng lề mặc định */
     margin-bottom: 10px;
 }
 
 .bot-message li {
-    margin-bottom: 5px;
+    position: relative;     /* Cần thiết để định vị dấu chấm */
+    padding-left: 20px;   /* Tạo không gian cho dấu chấm */
+    margin-bottom: 8px;   /* Tăng khoảng cách giữa các dòng */
+}
+
+.bot-message li::before {
+    content: "•";           /* Thêm dấu chấm tròn vào đầu dòng */
+    position: absolute;
+    left: 0;
+    color: #667eea;         /* Tô màu cho dấu chấm để hợp với thiết kế */
+    font-weight: bold;
+    font-size: 1.2em;       /* Làm cho dấu chấm to hơn một chút */
+    line-height: 1;
 }
 
 .bot-message strong {
