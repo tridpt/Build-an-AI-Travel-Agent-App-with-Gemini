@@ -927,3 +927,54 @@ small {
         grid-template-columns: 1fr;
     }
 }
+
+/* Thêm vào cuối file public/css/style.css */
+.input-container {
+    display: flex;
+    gap: 10px;
+    align-items: center; /* Căn giữa các item */
+}
+
+.attach-button {
+    padding: 14px;
+    background: #f0f0f0;
+    color: #555;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.attach-button:hover {
+    background: #e0e0e0;
+    border-color: #ccc;
+}
+
+.image-preview-container {
+    position: relative;
+    margin-top: 10px;
+    width: 100px;
+}
+
+#imagePreview {
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.remove-image-button {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: #333;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+    cursor: pointer;
+    line-height: 24px;
+    text-align: center;
+}
