@@ -316,7 +316,7 @@ This project is licensed under the **MIT License** - see the LICENSE file for de
 - [ ] Flight search integration
 - [ ] Price comparison across multiple booking sites
 - [ ] User authentication and saved trips
-- [ ] Social sharing features
+- [x] Social sharing features
 - [ ] Trip collaboration (shared planning)
 - [ ] Mobile app (React Native)
 - [x] Weather API integration

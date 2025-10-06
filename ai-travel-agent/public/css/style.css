@@ -978,3 +978,60 @@ small {
     line-height: 24px;
     text-align: center;
 }
+
+/* Share Dropdown */
+.share-dropdown {
+    position: relative;
+}
+
+.share-button {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #34a853 0%, #0f9d58 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 14px;
+}
+
+.share-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(52, 168, 83, 0.5);
+}
+
+.share-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 5px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 150px;
+    overflow: hidden;
+}
+
+.share-menu.show {
+    display: block;
+}
+
+.share-menu button {
+    display: block;
+    width: 100%;
+    padding: 12px 20px;
+    background: white;
+    color: #333;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.share-menu button:hover {
+    background: #f0f3ff;
+    color: #34a853;
+}

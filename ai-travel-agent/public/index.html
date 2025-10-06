@@ -8,7 +8,6 @@
 </head>
 <body>
     <div class="container">
-        <!-- Language Switcher -->
         <div class="language-switcher">
             <button onclick="switchLanguage('vi')" class="lang-btn active" id="lang-vi">🇻🇳 VI</button>
             <button onclick="switchLanguage('en')" class="lang-btn" id="lang-en">🇬🇧 EN</button>
@@ -17,7 +16,6 @@
         <h1 data-i18n="title">🌍 AI Travel Agent</h1>
         <p class="subtitle" data-i18n="subtitle">Trợ lý du lịch thông minh với Google Gemini</p>
         
-        <!-- Tab Navigation -->
         <div class="tab-container">
             <button class="tab-button active" data-tab="form">
                 <span data-i18n="tabPlan">📋 Lên Kế Hoạch</span>
@@ -27,7 +25,6 @@
             </button>
         </div>
 
-        <!-- Form Tab -->
         <div id="formTab" class="tab-content active">
             <div class="travel-form">
                 <h2 data-i18n="formTitle">🎯 Thông tin chuyến đi của bạn</h2>
@@ -117,19 +114,14 @@
                 </button>
             </div>
 
-            <!-- Result Display -->
             <div id="planResult" class="plan-result" style="display: none;">
-                <!-- Weather Section - THÊM MỚI -->
                 <div class="weather-section" style="margin-bottom: 25px;">
                     <div id="weather-current-container"></div>
                     <div id="weather-forecast-container"></div>
                 </div>
-                <!-- End Weather Section -->
-
                 <div class="result-header">
                     <h2 data-i18n="resultTitle">🎉 Lịch trình của bạn</h2>
                     <div class="result-actions">
-                        <!-- Export Dropdown -->
                         <div class="export-dropdown">
                             <button class="export-button" id="exportButton">
                                 📥 <span data-i18n="exportButton">Xuất File</span> ▼
@@ -141,6 +133,19 @@
                                 <button onclick="tripExporter.exportToText()">📃 Text</button>
                             </div>
                         </div>
+
+                        <div class="share-dropdown">
+                            <button class="share-button" id="shareButton">
+                                📤 <span data-i18n="shareButton">Chia sẻ</span> ▼
+                            </button>
+                            <div class="share-menu" id="shareMenu">
+                                <button onclick="shareHandler.share('facebook')">Facebook</button>
+                                <button onclick="shareHandler.share('twitter')">Twitter</button>
+                                <button onclick="shareHandler.share('telegram')">Telegram</button>
+                                <button onclick="shareHandler.share('email')">Email</button>
+                            </div>
+                        </div>
+
                         <button id="editPlanButton" class="edit-button" data-i18n="editButton">✏️ Chỉnh sửa</button>
                     </div>
                 </div>
@@ -148,7 +153,6 @@
             </div>
         </div>
 
-        <!-- Chat Tab -->
         <div id="chatTab" class="tab-content">
             <div class="chat-container">
                 <div class="chat-messages" id="chatMessages"></div>
@@ -166,12 +170,11 @@
         </div>
     </div>
 
-    <!-- Load scripts in order -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="js/translations.js"></script>
     <script src="js/exportHandler.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/shareHandler.js"></script> <script src="js/main.js"></script>
     <script src="js/weatherHandler.js"></script>
     <script src="js/formHandler.js"></script>
 </body>

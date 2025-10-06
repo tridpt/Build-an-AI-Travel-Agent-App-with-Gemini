@@ -216,6 +216,7 @@ Please begin the itinerary now.`;
                 
                 // Save trip data for export
                 tripExporter.setTripData(formData, this.planContent.innerHTML);
+                shareHandler.setTripData(formData, this.planContent.innerHTML);
             } else {
                 alert(t('errorPlan'));
             }

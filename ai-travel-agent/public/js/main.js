@@ -210,4 +210,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    const shareButton = document.getElementById('shareButton');
+    const shareMenu = document.getElementById('shareMenu');
+    if (shareButton && shareMenu) {
+        shareButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            shareMenu.classList.toggle('show');
+        });
+    }
+
+    document.addEventListener('click', (e) => {
+        if (exportMenu && !exportButton.contains(e.target) && !exportMenu.contains(e.target)) {
+            exportMenu.classList.remove('show');
+        }
+        // THÊM MỚI: Ẩn menu chia sẻ khi click ra ngoài
+        if (shareMenu && !shareButton.contains(e.target) && !shareMenu.contains(e.target)) {
+            shareMenu.classList.remove('show');
+        }
+    });
 });
