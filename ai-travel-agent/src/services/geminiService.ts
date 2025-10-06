@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI, Part } from '@google/generative-ai';
+import { GoogleGenerativeAI, Part, Content } from '@google/generative-ai';
 
 export class GeminiService {
   private genAI: GoogleGenerativeAI;
@@ -10,7 +10,7 @@ export class GeminiService {
       throw new Error('GEMINI_API_KEY is not set in environment variables');
     }
     this.genAI = new GoogleGenerativeAI(apiKey);
-    // SỬA Ở ĐÂY: Đổi thành model 'gemini-pro' ổn định hơn
+    // SỬA Ở ĐÂY: Dùng tên model chính xác và mạnh mẽ
     this.model = this.genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
   }
 
@@ -26,7 +26,11 @@ export class GeminiService {
   }
 }
 
-export async function generateFreeChat(message: string, image?: Express.Multer.File): Promise<string> {
+export async function generateFreeChat(
+  message: string,
+  history: Content[],
+  image?: Express.Multer.File
+): Promise<string> {
   try {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
@@ -34,17 +38,31 @@ export async function generateFreeChat(message: string, image?: Express.Multer.F
     }
     
     const genAI = new GoogleGenerativeAI(apiKey);
-    // SỬA Ở ĐÂY: Sử dụng model 'gemini-pro-vision' để xử lý ảnh
+    // SỬA Ở ĐÂY: Dùng tên model chính xác và mạnh mẽ
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
 
-    const promptParts: (string | Part)[] = [];
+    const chat = model.startChat({
+        history: history,
+        generationConfig: {
+            maxOutputTokens: 100000, // Tăng giới hạn để có câu trả lời chi tiết hơn
+        },
+    });
 
-    // Prompt cho AI biết vai trò của nó
-    const systemPrompt = "You are a helpful travel assistant. Analyze the user's text and image to provide relevant travel information.";
+    // --- BẮT ĐẦU PHẦN SỬA LỖI ---
+    // Xây dựng prompt một cách rõ ràng và đúng chuẩn
+    const promptParts: Part[] = [];
+
+   const systemInstruction = {
+        role: "system",
+        parts: [{ text: "You are a helpful travel assistant. IMPORTANT FORMATTING RULE: For any list, you must use bullet points (* or -). Do not use numbered lists." }]
+    };
     
-    // Thêm message của người dùng vào trước
-    promptParts.push(message);
+    // Thêm tin nhắn của người dùng
+    if (message) {
+        promptParts.push({ text: message });
+    }
 
+    // Thêm hình ảnh nếu có
     if (image) {
       promptParts.push({
         inlineData: {
@@ -53,11 +71,9 @@ export async function generateFreeChat(message: string, image?: Express.Multer.F
         },
       });
     }
-
-    // Kết hợp system prompt và user prompt
-    const finalPrompt = [systemPrompt, ...promptParts];
     
-    const result = await model.generateContent(finalPrompt);
+    // Gửi yêu cầu với cả chỉ dẫn hệ thống và prompt của người dùng
+    const result = await model.generateContent([systemInstruction.parts[0].text, ...promptParts]);
     const response = await result.response;
     return response.text();
     

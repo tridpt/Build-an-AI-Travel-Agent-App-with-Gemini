@@ -153,7 +153,7 @@ class TravelFormHandler {
 **Formatting and Language Requirements:**
 * **Language:** The entire response must be in **${lang}**.
 * **Currency:** All monetary values must be in **${currency}**.
-* **Formatting:** Use Markdown extensively for clarity and visual appeal. Use headings, bold text, bullet points, and emojis to structure the information.
+* **Formatting:** Use Markdown extensively for clarity and visual appeal. Use headings, bold text, and emojis. IMPORTANT: For any list, you must use bullet points (* or -). Do not use numbered lists.
 * **Tone:** Be friendly, enthusiastic, and helpful.
 
 Please begin the itinerary now.`;

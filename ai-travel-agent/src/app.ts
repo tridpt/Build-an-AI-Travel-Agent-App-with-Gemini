@@ -5,6 +5,7 @@ import cors from 'cors';
 import multer from 'multer';
 import { GeminiService, generateFreeChat } from './services/geminiService';
 import { WeatherService } from './services/weatherService';
+import { Content, Part } from '@google/generative-ai'; // Quan trọng: import thêm Part
 
 dotenv.config();
 
@@ -21,6 +22,9 @@ app.use(express.static(path.join(__dirname, '../public')));
 const geminiService = new GeminiService();
 const weatherService = new WeatherService();
 
+// Lưu trữ lịch sử chat (sẽ reset khi server khởi động lại)
+let chatHistory: Content[] = [];
+
 // Định nghĩa kiểu cho body của request chat
 interface ChatRequestBody {
   message?: string;
@@ -28,7 +32,6 @@ interface ChatRequestBody {
 
 app.post('/api/chat', upload.single('image'), async (req: Request, res: Response) => {
   try {
-    // Ép kiểu cho req.body để TypeScript không báo lỗi
     const { message } = req.body as ChatRequestBody;
     const image = req.file;
 
@@ -36,10 +39,37 @@ app.post('/api/chat', upload.single('image'), async (req: Request, res: Response
       return res.status(400).json({ error: 'Message or image is required' });
     }
 
-    const response = await generateFreeChat(message || '', image);
-    res.json({ response });
+    const userMessage = message || '';
 
-  } catch (error: any) {
+    // Gọi service và truyền vào lịch sử chat hiện tại
+    const responseText = await generateFreeChat(userMessage, chatHistory, image);
+
+    // --- BẮT ĐẦU PHẦN SỬA LỖI ---
+    // Xây dựng các "parts" cho lượt nói của người dùng, bao gồm cả text và image
+    const userParts: Part[] = [];
+    if (userMessage) {
+        userParts.push({ text: userMessage });
+    }
+    if (image) {
+        userParts.push({
+            inlineData: {
+                mimeType: image.mimetype,
+                data: image.buffer.toString('base64'),
+            },
+        });
+    }
+
+    // Chỉ thêm vào lịch sử nếu có nội dung từ người dùng
+    if (userParts.length > 0) {
+        chatHistory.push({ role: 'user', parts: userParts });
+        chatHistory.push({ role: 'model', parts: [{ text: responseText }] });
+    }
+    // --- KẾT THÚC PHẦN SỬA LỖI ---
+
+    res.json({ response: responseText });
+
+  } catch (error: any)
+    {
     console.error('Chat error:', error);
     res.status(500).json({
       error: 'Failed to generate response',
@@ -48,7 +78,8 @@ app.post('/api/chat', upload.single('image'), async (req: Request, res: Response
   }
 });
 
-// Weather endpoints
+
+// Các endpoints của Weather giữ nguyên...
 app.get('/api/weather/current/:city', async (req: Request, res: Response) => {
   try {
     const { city } = req.params;
