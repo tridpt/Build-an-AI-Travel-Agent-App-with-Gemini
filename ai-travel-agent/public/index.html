@@ -59,8 +59,16 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="budget" data-i18n="budget">💰 Ngân sách</label>
-                        <input type="number" id="budget" data-i18n="budgetPlaceholder" placeholder="Ví dụ: 5000000" min="0" step="100000" required>
+                        <label data-i18n="budget">💰 Ngân sách</label>
+                        <div class="budget-input-group">
+                            <input type="number" id="budget" data-i18n="budgetPlaceholder" placeholder="Ví dụ: 5000000" min="0" step="100000" required>
+                            <select id="budgetCurrency">
+                                <option value="VND">VNĐ</option>
+                                <option value="USD">USD</option>
+                                <option value="EUR">EUR</option>
+                                <option value="JPY">JPY</option>
+                            </select>
+                        </div>
                         <small id="budgetDisplay">0 VNĐ</small>
                     </div>
                     <div class="form-group">

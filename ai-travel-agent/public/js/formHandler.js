@@ -5,33 +5,44 @@ class TravelFormHandler {
         this.planContent = document.getElementById('planContent');
         this.editButton = document.getElementById('editPlanButton');
         this.budgetInput = document.getElementById('budget');
+        this.budgetCurrency = document.getElementById('budgetCurrency');
         this.budgetDisplay = document.getElementById('budgetDisplay');
         
         this.initializeEventListeners();
         this.setMinDates();
+        this.updateBudgetDisplay(); // Initial call
     }
     
     initializeEventListeners() {
-        // Budget formatting
-        this.budgetInput.addEventListener('input', (e) => {
-            const value = parseInt(e.target.value) || 0;
-            if (currentLang === 'vi') {
-                this.budgetDisplay.textContent = value.toLocaleString('vi-VN') + ' ' + t('currency');
-            } else {
-                this.budgetDisplay.textContent = t('currencySymbol') + value.toLocaleString('en-US');
-            }
-        });
+        this.budgetInput.addEventListener('input', () => this.updateBudgetDisplay());
+        this.budgetCurrency.addEventListener('change', () => this.updateBudgetDisplay());
         
-        // Date validation
         document.getElementById('startDate').addEventListener('change', (e) => {
             document.getElementById('endDate').setAttribute('min', e.target.value);
         });
         
-        // Generate button
         this.generateButton.addEventListener('click', () => this.generatePlan());
-        
-        // Edit button
         this.editButton.addEventListener('click', () => this.editPlan());
+    }
+
+    updateBudgetDisplay() {
+        const value = parseInt(this.budgetInput.value) || 0;
+        const currency = this.budgetCurrency.value;
+        
+        let formattedValue;
+        
+        if (currentLang === 'vi') {
+            formattedValue = value.toLocaleString('vi-VN') + ' ' + currency;
+        } else {
+            // For English, use standard currency symbols for better readability
+            const symbols = { 'USD': '$', 'EUR': '€', 'JPY': '¥', 'VND': '₫' };
+            if (symbols[currency]) {
+                formattedValue = symbols[currency] + value.toLocaleString('en-US');
+            } else {
+                formattedValue = value.toLocaleString('en-US') + ' ' + currency;
+            }
+        }
+        this.budgetDisplay.textContent = formattedValue;
     }
     
     setMinDates() {
@@ -47,6 +58,7 @@ class TravelFormHandler {
             startDate: document.getElementById('startDate').value,
             endDate: document.getElementById('endDate').value,
             budget: parseInt(document.getElementById('budget').value) || 0,
+            budgetCurrency: document.getElementById('budgetCurrency').value,
             travelers: parseInt(document.getElementById('travelers').value) || 1,
             travelStyle: document.getElementById('travelStyle').value,
             transportation: document.getElementById('transportation').value,
@@ -89,7 +101,7 @@ class TravelFormHandler {
     
     buildPrompt(formData, interests, days) {
         const lang = currentLang === 'vi' ? 'VIETNAMESE' : 'ENGLISH';
-        const currency = t('currency');
+        const currency = formData.budgetCurrency;
         const destination = formData.destination || 'a suitable destination based on my preferences';
 
         let prompt = `As an expert travel agent, please create a personalized and highly detailed travel itinerary in ${lang}.
@@ -189,32 +201,18 @@ Please begin the itinerary now.`;
                 this.planContent.innerHTML = markdownToHtml(enhancedResponse);
                 this.planResult.style.display = 'block';
                 
-                // ← THÊM PHẦN WEATHER Ở ĐÂY
-                // Display weather if destination is provided
                 if (formData.destination && formData.destination.trim() !== '') {
                     if (typeof weatherHandler !== 'undefined') {
                         weatherHandler.setLanguage(currentLang);
-                        
-                        // Display current weather
-                        await weatherHandler.displayCurrentWeather(
-                            formData.destination, 
-                            'weather-current-container'
-                        );
-                        
-                        // Display forecast
-                        await weatherHandler.displayForecast(
-                            formData.destination, 
-                            'weather-forecast-container'
-                        );
+                        await weatherHandler.displayCurrentWeather(formData.destination, 'weather-current-container');
+                        await weatherHandler.displayForecast(formData.destination, 'weather-forecast-container');
                     } else {
                         console.warn('weatherHandler is not defined');
                     }
                 }
-                // ← KẾT THÚC PHẦN WEATHER
                 
                 this.planResult.scrollIntoView({ behavior: 'smooth' });
                 
-                // Save trip data for export
                 tripExporter.setTripData(formData, this.planContent.innerHTML);
                 shareHandler.setTripData(formData, this.planContent.innerHTML);
             } else {
@@ -230,7 +228,6 @@ Please begin the itinerary now.`;
     }
     
     enhanceWithBookingLinks(text, destination) {
-        // Xử lý định dạng chi tiết có dấu |
         text = text.replace(/🏨\s*([^|\n]+)\s*\|([^|\n]*)\|([^|\n]*)\|?([^\n]*)/g, (match, name, address, price, rating) => {
             name = name.replace(/\*\*/g, '').trim();
             const originalName = name;
@@ -244,7 +241,6 @@ Please begin the itinerary now.`;
 - [Google Maps](https://www.google.com/maps/search/?api=1&query=${mapsQuery})`;
         });
     
-        // Xử lý các khối thông tin khách sạn (multi-line)
         text = text.replace(/(^\s*\*?\s*🏨[^\S\n]*.*(?:\n^\s*.*[📍💵⭐].*)*)/gm, (match) => {
             if (match.includes('|') || match.includes('[Booking.com]')) return match;
     
@@ -275,7 +271,6 @@ Please begin the itinerary now.`;
             return match;
         });
     
-        // Xử lý các khối thông tin nhà hàng (multi-line)
         text = text.replace(/(^\s*\*?\s*🍽️[^\S\n]*.*(?:\n^\s*.*[📍💵🍴].*)*)/gm, (match) => {
             if (match.includes('|') || match.includes('[Google Maps]')) return match;
     
@@ -314,7 +309,6 @@ Please begin the itinerary now.`;
     }
 }
 
-// Initialize form handler
 let formHandler;
 document.addEventListener('DOMContentLoaded', () => {
     formHandler = new TravelFormHandler();

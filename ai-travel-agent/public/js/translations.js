@@ -21,8 +21,7 @@ const translations = {
         endDate: '📅 Ngày kết thúc',
         budget: '💰 Ngân sách',
         budgetPlaceholder: 'Ví dụ: 5000000',
-        currency: 'VNĐ',
-        currencySymbol: 'VNĐ',
+        budgetCurrencyLabel: 'Đơn vị',
         travelers: '👥 Số người đi',
         travelersPlaceholder: 'Số người',
         travelStyle: '🎨 Phong cách du lịch',
@@ -101,8 +100,7 @@ const translations = {
         endDate: '📅 End Date',
         budget: '💰 Budget',
         budgetPlaceholder: 'e.g., 500',
-        currency: 'USD',
-        currencySymbol: '$',
+        budgetCurrencyLabel: 'Currency',
         travelers: '👥 Number of Travelers',
         travelersPlaceholder: 'Number',
         travelStyle: '🎨 Travel Style',
@@ -170,31 +168,31 @@ function t(key) {
 function switchLanguage(lang) {
     currentLang = lang;
     updateUIText();
-    updateBudgetDisplay();
+    // This function will now be called from formHandler to ensure it has the correct currency
+    // updateBudgetDisplay(); 
+    if (typeof formHandler !== 'undefined' && formHandler) {
+        formHandler.updateBudgetDisplay();
+    }
     updateWelcomeMessage();
     
-    // Update active language button
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.classList.remove('active');
     });
     document.getElementById(`lang-${lang}`).classList.add('active');
     
-    // Save preference
     localStorage.setItem('preferredLanguage', lang);
 }
 
 function updateUIText() {
-    // Update text elements
     document.querySelectorAll('[data-i18n]').forEach(elem => {
         const key = elem.getAttribute('data-i18n');
         if (elem.tagName === 'INPUT' || elem.tagName === 'TEXTAREA') {
-            elem.placeholder = t(key);
+            if (elem.placeholder) elem.placeholder = t(key);
         } else {
             elem.textContent = t(key);
         }
     });
     
-    // Update select options
     const travelStyleSelect = document.getElementById('travelStyle');
     if (travelStyleSelect) {
         const selectedValue = travelStyleSelect.value;
@@ -226,7 +224,6 @@ function updateUIText() {
         transportSelect.value = selectedValue;
     }
     
-    // Update checkbox labels
     const checkboxes = [
         { value: 'beach', key: 'interestBeach' },
         { value: 'mountain', key: 'interestMountain' },
@@ -246,21 +243,9 @@ function updateUIText() {
     });
 }
 
-function updateBudgetDisplay() {
-    const budgetInput = document.getElementById('budget');
-    const budgetDisplay = document.getElementById('budgetDisplay');
-    if (budgetInput && budgetDisplay) {
-        const value = parseInt(budgetInput.value) || 0;
-        if (currentLang === 'vi') {
-            budgetDisplay.textContent = value.toLocaleString('vi-VN') + ' ' + t('currency');
-        } else {
-            budgetDisplay.textContent = t('currencySymbol') + value.toLocaleString('en-US');
-        }
-    }
-}
+// This function is now in formHandler.js to access currency value directly.
 
 function updateWelcomeMessage() {
-    // Update welcome message in chat
     const chatMessages = document.getElementById('chatMessages');
     if (chatMessages && chatMessages.children.length > 0) {
         const firstMessage = chatMessages.children[0];
@@ -270,7 +255,6 @@ function updateWelcomeMessage() {
     }
 }
 
-// Load saved language on page load
 document.addEventListener('DOMContentLoaded', () => {
     const savedLang = localStorage.getItem('preferredLanguage') || 'vi';
     switchLanguage(savedLang);
