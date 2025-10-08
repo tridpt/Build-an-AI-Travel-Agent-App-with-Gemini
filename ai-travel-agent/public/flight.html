@@ -13,33 +13,45 @@
             <button onclick="switchLanguage('en')" class="lang-btn" id="lang-en">EN</button>
         </div>
 
-        <h1>🌍 AI Travel Agent</h1>
+        <h1 data-i18n="title">🌍 AI Travel Agent</h1>
+        <p class="subtitle" data-i18n="subtitle">Trợ lý du lịch thông minh với Google Gemini</p>
         
-        <div style="text-align: center; margin-bottom: 20px;">
-            <a href="/" class="tab-button" style="text-decoration: none; display: inline-block; border-bottom: none;">⬅️ Quay về Trang chủ</a>
+        <div class="tab-container">
+            <a href="/#form" class="tab-button" data-i18n="tabPlan">
+                <span>📋 Lên Kế Hoạch</span>
+            </a>
+            <a href="/#chat" class="tab-button" data-i18n="tabChat">
+                <span>💬 Chat Tự Do</span>
+            </a>
+            <a href="/currency.html" class="tab-button" data-i18n="tabCurrency">
+                <span>💱 Chuyển đổi tiền tệ</span>
+            </a>
+            <a href="/flight.html" class="tab-button active">
+                <span>✈️ Tìm chuyến bay</span>
+            </a>
         </div>
 
         <div class="travel-form">
-            <h2>✈️ Tìm kiếm chuyến bay</h2>
+            <h2 data-i18n="flightSearchTitle">✈️ Tìm kiếm chuyến bay</h2>
             <div class="form-row">
                 <div class="form-group">
-                    <label for="fromAirport">Sân bay đi (IATA)</label>
+                    <label for="fromAirport" data-i18n="fromAirportLabel">Sân bay đi (IATA)</label>
                     <input type="text" id="fromAirport" placeholder="Ví dụ: SGN">
                 </div>
                 <div class="form-group">
-                    <label for="toAirport">Sân bay đến (IATA)</label>
+                    <label for="toAirport" data-i18n="toAirportLabel">Sân bay đến (IATA)</label>
                     <input type="text" id="toAirport" placeholder="Ví dụ: HAN">
                 </div>
             </div>
             <div class="form-group">
-                <label for="flightDate">Ngày bay</label>
+                <label for="flightDate" data-i18n="flightDateLabel">Ngày bay</label>
                 <input type="date" id="flightDate">
             </div>
-            <button id="searchFlightButton" class="generate-button">Tìm kiếm</button>
+            <button id="searchFlightButton" class="generate-button" data-i18n="searchFlightButton">Tìm kiếm</button>
         </div>
 
         <div id="flightResults" class="plan-result" style="display: none;">
-            <h2>Kết quả tìm kiếm</h2>
+            <h2 data-i18n="flightResultsTitle">Kết quả tìm kiếm</h2>
             <div id="flightResultsContent" class="plan-content"></div>
         </div>
     </div>
