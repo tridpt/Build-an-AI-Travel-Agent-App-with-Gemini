@@ -61,6 +61,7 @@ class TravelFormHandler {
             budgetCurrency: document.getElementById('budgetCurrency').value,
             travelers: parseInt(document.getElementById('travelers').value) || 1,
             travelStyle: document.getElementById('travelStyle').value,
+            mustVisitPlaces: document.getElementById('mustVisitPlaces').value.trim(),
             transportation: document.getElementById('transportation').value,
             additionalInfo: document.getElementById('additionalInfo').value.trim()
         };
@@ -104,6 +105,11 @@ class TravelFormHandler {
         const currency = formData.budgetCurrency;
         const destination = formData.destination || 'a suitable destination based on my preferences';
 
+        let mustVisitPrompt = '';
+        if (formData.mustVisitPlaces) {
+            mustVisitPrompt = `* **Must-Visit Places:** ${formData.mustVisitPlaces}`;
+        }
+
         let prompt = `As an expert travel agent, please create a personalized and highly detailed travel itinerary in ${lang}.
 
 **Objective:** Generate a comprehensive travel plan that is not only informative but also inspiring and easy to follow.
@@ -116,6 +122,7 @@ class TravelFormHandler {
 * **Budget:** Approximately ${formData.budget.toLocaleString()} ${currency} (total for all travelers)
 * **Travel Style:** ${formData.travelStyle}
 * **Interests:** ${interests.join(', ')}
+${mustVisitPrompt}
 * **Preferred Transportation:** ${formData.transportation || 'Not specified'}
 * **Additional Notes:** ${formData.additionalInfo || 'None'}
 
@@ -127,6 +134,7 @@ class TravelFormHandler {
 * Mention the general weather conditions to expect and suggest appropriate clothing.
 
 **2. Detailed Daily Itinerary:**
+* **IMPORTANT:** The itinerary must try to incorporate the specific "Must-Visit Places" provided by the traveler.
 * For each day, provide a schedule from morning to night.
 * Use clear time slots (e.g., 9:00 AM - 11:00 AM).
 * For each activity, include:
