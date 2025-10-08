@@ -1144,3 +1144,48 @@ small {
     padding-top: 20px;
     border-top: 1px solid #e0e0e0;
 }
+
+/* ==========================================
+   FOOTER STYLES
+   ========================================== */
+
+footer {
+    text-align: center;
+    margin-top: 40px;
+    padding: 30px 20px;
+    border-top: 1px solid #e9ecef;
+    background-color: #f8f9fa;
+    /* Làm tròn góc dưới của footer cho khớp với container */
+    border-radius: 0 0 20px 20px;
+}
+
+.footer-about {
+    color: #6c757d;
+    font-size: 15px;
+    margin-bottom: 15px;
+    margin-top: 0;
+}
+
+.footer-links {
+    margin-bottom: 15px;
+    color: #adb5bd; /* Màu cho dấu gạch đứng */
+}
+
+.footer-links a {
+    color: #764ba2;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s;
+    margin: 0 10px;
+}
+
+.footer-links a:hover {
+    color: #667eea;
+    text-decoration: underline;
+}
+
+.footer-copyright {
+    color: #adb5bd;
+    font-size: 13px;
+    margin: 0;
+}
