@@ -1102,3 +1102,45 @@ small {
     border-radius: 8px;
     border: 1px solid #dbe1ff;
 }
+
+/* Feedback Buttons Styling */
+.feedback-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.bot-message .feedback-buttons {
+    justify-content: flex-start; /* Align buttons to the left inside a chat bubble */
+}
+
+.feedback-btn {
+    background: #f0f3ff;
+    border: 1px solid #dbe1ff;
+    border-radius: 20px;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.feedback-btn:hover {
+    background: #dbe1ff;
+    border-color: #c8d1ff;
+}
+
+.feedback-btn.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+/* Adjust plan result feedback buttons alignment and spacing */
+.plan-result .feedback-buttons {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+}

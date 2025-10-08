@@ -23,6 +23,26 @@ class TravelFormHandler {
         
         this.generateButton.addEventListener('click', () => this.generatePlan());
         this.editButton.addEventListener('click', () => this.editPlan());
+
+        // START: Thêm listener cho các nút feedback của Lịch trình
+        const planFeedbackContainer = document.getElementById('planFeedbackButtons');
+        planFeedbackContainer.addEventListener('click', function(e) {
+            if (e.target && e.target.closest('.feedback-btn')) {
+                const button = e.target.closest('.feedback-btn');
+                const feedback = button.dataset.feedback;
+
+                if (button.classList.contains('active')) {
+                    button.classList.remove('active');
+                } else {
+                    planFeedbackContainer.querySelectorAll('.feedback-btn').forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                }
+                
+                console.log(`Plan Feedback received: ${feedback}`);
+                // Trong tương lai, bạn có thể gửi phản hồi này về server tại đây
+            }
+        });
+        // END: Thêm listener
     }
 
     updateBudgetDisplay() {
@@ -196,9 +216,7 @@ Please begin the itinerary now.`;
         try {
             const response = await fetch('http://localhost:3000/api/chat', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: prompt })
             });
             
@@ -208,14 +226,18 @@ Please begin the itinerary now.`;
                 const enhancedResponse = this.enhanceWithBookingLinks(data.response, formData.destination);
                 this.planContent.innerHTML = markdownToHtml(enhancedResponse);
                 this.planResult.style.display = 'block';
+
+                // START: Hiển thị và reset các nút feedback
+                const planFeedbackButtons = document.getElementById('planFeedbackButtons');
+                planFeedbackButtons.style.display = 'flex';
+                planFeedbackButtons.querySelectorAll('.feedback-btn').forEach(btn => btn.classList.remove('active'));
+                // END: Hiển thị và reset
                 
                 if (formData.destination && formData.destination.trim() !== '') {
                     if (typeof weatherHandler !== 'undefined') {
                         weatherHandler.setLanguage(currentLang);
                         await weatherHandler.displayCurrentWeather(formData.destination, 'weather-current-container');
                         await weatherHandler.displayForecast(formData.destination, 'weather-forecast-container');
-                    } else {
-                        console.warn('weatherHandler is not defined');
                     }
                 }
                 

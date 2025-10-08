@@ -90,11 +90,25 @@ function addMessage(message, isUser) {
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message');
     messageDiv.classList.add(isUser ? 'user-message' : 'bot-message');
+    
     if (isUser) {
         messageDiv.textContent = message;
     } else {
-        messageDiv.innerHTML = markdownToHtml(message);
+        // Tạo một div cho nội dung và một div cho feedback để dễ quản lý
+        const contentDiv = document.createElement('div');
+        contentDiv.innerHTML = markdownToHtml(message);
+        
+        const feedbackContainer = document.createElement('div');
+        feedbackContainer.classList.add('feedback-buttons');
+        feedbackContainer.innerHTML = `
+            <button class="feedback-btn" data-feedback="like" title="Hữu ích">👍</button>
+            <button class="feedback-btn" data-feedback="dislike" title="Không hữu ích">👎</button>
+        `;
+        
+        messageDiv.appendChild(contentDiv);
+        messageDiv.appendChild(feedbackContainer);
     }
+    
     chatMessages.appendChild(messageDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
@@ -233,4 +247,28 @@ document.addEventListener('DOMContentLoaded', () => {
             shareMenu.classList.remove('show');
         }
     });
+
+    // START: Thêm Event listener cho các nút feedback trong chat
+    chatMessages.addEventListener('click', function(e) {
+        // Sử dụng .closest() để bắt sự kiện click dù người dùng bấm vào icon hay button
+        const button = e.target.closest('.feedback-btn');
+        if (button) {
+            const feedback = button.dataset.feedback;
+            const parent = button.parentElement;
+
+            // Xử lý logic active/inactive
+            if (button.classList.contains('active')) {
+                button.classList.remove('active');
+            } else {
+                // Xóa active ở các nút khác trong cùng group trước
+                parent.querySelectorAll('.feedback-btn').forEach(btn => btn.classList.remove('active'));
+                // Kích hoạt nút được bấm
+                button.classList.add('active');
+            }
+
+            console.log(`Chat Feedback received: ${feedback}`);
+            // Trong tương lai, bạn có thể gửi phản hồi này về server tại đây
+        }
+    });
+    // END: Thêm Event listener
 });
