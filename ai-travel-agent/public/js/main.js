@@ -4,48 +4,48 @@ const tabContents = document.querySelectorAll('.tab-content');
 
 tabButtons.forEach(button => {
     button.addEventListener('click', () => {
-        // Bỏ qua nếu là link chuyển trang, không phải tab
         if (button.hasAttribute('href')) return;
-
         const tabName = button.dataset.tab;
-        
         tabButtons.forEach(btn => btn.classList.remove('active'));
         tabContents.forEach(content => content.classList.remove('active'));
-        
         button.classList.add('active');
         document.getElementById(`${tabName}Tab`).classList.add('active');
     });
 });
 
-// Markdown to HTML
-function markdownToHtml(markdown) {
-    const blocks = markdown.split(/\n\s*\n/);
-    const htmlBlocks = blocks.map(block => {
-        block = block.trim();
-        if (block.length === 0) return '';
-        if (block.startsWith('#### ')) return `<h4>${block.substring(5)}</h4>`;
-        if (block.startsWith('### ')) return `<h3>${block.substring(4)}</h3>`;
-        if (block.startsWith('## ')) return `<h2>${block.substring(3)}</h2>`;
-        if (block.startsWith('# ')) return `<h1>${block.substring(2)}</h1>`;
-        if (block === '---') return '<hr>';
-        if (/^(\*|-|\d+\.) /m.test(block)) {
-            const lines = block.split('\n');
-            const listItems = lines.map(line => '<li>' + line.replace(/^(\*|-|\d+\.) /, '').trim() + '</li>').join('\n');
-            if (block.startsWith('* ') || block.startsWith('- ')) {
-                return `<ul>\n${listItems}\n</ul>`;
-            } else {
-                return `<ol>\n${listItems}\n</ol>`;
-            }
-        }
-        return `<p>${block.replace(/\n/g, '<br>')}</p>`;
+// --- BẮT ĐẦU PHẦN SỬA LỖI FORMAT ---
+
+// Cấu hình thư viện marked.js để giữ lại các định dạng link tùy chỉnh
+if (typeof marked !== 'undefined') {
+    const renderer = new marked.Renderer();
+    
+    // Ghi đè hàm render link mặc định
+    renderer.link = (href, title, text) => {
+        // Thêm class 'booking-link' và icon cho tất cả các link
+        const titleAttribute = title ? ` title="${title}"` : '';
+        return `<a href="${href}"${titleAttribute} target="_blank" class="booking-link">${text} 🔗</a>`;
+    };
+
+    marked.setOptions({
+        renderer: renderer,
+        gfm: true,      // Kích hoạt chế độ tương thích GitHub Flavored Markdown
+        breaks: true    // Chuyển các dấu xuống dòng đơn thành thẻ <br>
     });
-    let finalHtml = htmlBlocks.join('\n');
-    finalHtml = finalHtml.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    finalHtml = finalHtml.replace(/\*(.*?)\*/g, '<em>$1</em>');
-    finalHtml = finalHtml.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="booking-link">$1 🔗</a>');
-    finalHtml = finalHtml.replace(/`([^`]+)`/g, '<code>$1</code>');
-    return finalHtml;
 }
+
+// Hàm markdownToHtml giờ sẽ sử dụng thư viện marked.js mạnh mẽ
+function markdownToHtml(markdown) {
+    if (typeof marked === 'undefined') {
+        console.error("Thư viện marked.js chưa được tải.");
+        // Fallback đơn giản để tránh lỗi
+        return markdown.replace(/\n/g, '<br>');
+    }
+    // Thư viện sẽ tự động xử lý tất cả các định dạng phức tạp, bao gồm cả danh sách nhiều cấp.
+    return marked.parse(markdown);
+}
+
+// --- KẾT THÚC PHẦN SỬA LỖI FORMAT ---
+
 
 // ===== CHAT TAB =====
 const chatMessages = document.getElementById('chatMessages');
