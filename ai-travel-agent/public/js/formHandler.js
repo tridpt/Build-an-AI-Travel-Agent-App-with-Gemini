@@ -258,78 +258,8 @@ Please begin the itinerary now.`;
     }
     
     enhanceWithBookingLinks(text, destination) {
-        text = text.replace(/🏨\s*([^|\n]+)\s*\|([^|\n]*)\|([^|\n]*)\|?([^\n]*)/g, (match, name, address, price, rating) => {
-            name = name.replace(/\*\*/g, '').trim();
-            const originalName = name;
-            const searchName = name.split('(')[0].trim();
-            const bookingQuery = encodeURIComponent(`${searchName} ${destination || ''}`);
-            const mapsQuery = encodeURIComponent(`${searchName} ${address.trim()} ${destination || ''}`);
-            return `🏨 **${originalName}** | ${address} | ${price} | ${rating}
-**${t('bookingLabel')}:**
-- [Booking.com](https://www.booking.com/search.html?ss=${bookingQuery})
-- [Agoda](https://www.agoda.com/search?city=${bookingQuery})
-- [Google Maps](https://www.google.com/maps/search/?api=1&query=${mapsQuery})`;
-        });
-    
-        text = text.replace(/(^\s*\*?\s*🏨[^\S\n]*.*(?:\n^\s*.*[📍💵⭐].*)*)/gm, (match) => {
-            if (match.includes('|') || match.includes('[Booking.com]')) return match;
-    
-            const lines = match.split('\n');
-            const nameLine = lines[0];
-            let hotelName = nameLine.replace(/^\s*\*?\s*🏨[^\S\n]*/, '').replace(/\*\*/g, '').trim();
-    
-            let address = '';
-            const addressLine = lines.find(line => line.includes('📍'));
-            if (addressLine) {
-                address = addressLine.replace(/[^\S\n]*📍[^\S\n]*/, '').trim();
-            }
-    
-            const searchInfo = hotelName.split('(')[0].trim();
-    
-            if (searchInfo) {
-                const searchQuery = encodeURIComponent(searchInfo + ' ' + (destination || ''));
-                const mapsQuery = encodeURIComponent(`${searchInfo} ${address} ${destination || ''}`.trim());
-                const bookingLabel = t('bookingLabel');
-                
-                const links = `**${bookingLabel}:**
-- [Booking.com](https://www.booking.com/search.html?ss=${searchQuery})
-- [Agoda](https://www.agoda.com/search?city=${searchQuery})
-- [Google Maps](https://www.google.com/maps/search/?api=1&query=${mapsQuery})`;
-    
-                return `${match}\n${links}`;
-            }
-            return match;
-        });
-    
-        text = text.replace(/(^\s*\*?\s*🍽️[^\S\n]*.*(?:\n^\s*.*[📍💵🍴].*)*)/gm, (match) => {
-            if (match.includes('|') || match.includes('[Google Maps]')) return match;
-    
-            const lines = match.split('\n');
-            const nameLine = lines[0];
-            let restaurantName = nameLine.replace(/^\s*\*?\s*🍽️[^\S\n]*/, '').replace(/\*\*/g, '').trim();
-    
-            let address = '';
-            const addressLine = lines.find(line => line.includes('📍'));
-            if (addressLine) {
-                address = addressLine.replace(/[^\S\n]*📍[^\S\n]*/, '').trim();
-            }
-    
-            const searchInfo = restaurantName.split('(')[0].trim();
-    
-            if (searchInfo) {
-                const mapsQuery = encodeURIComponent(`${searchInfo} ${address} ${destination || ''}`.trim());
-                const googleQuery = encodeURIComponent(`${searchInfo} restaurant ${destination || ''}`);
-                const searchLabel = t('searchLabel');
-                
-                const links = `**${searchLabel}:**
-- [Google Maps](https://www.google.com/maps/search/?api=1&query=${mapsQuery})
-- [Google Search](https://www.google.com/search?q=${googleQuery})`;
-                
-                return `${match}\n${links}`;
-            }
-            return match;
-        });
-    
+        // Chức năng này hiện đã được vô hiệu hóa để loại bỏ các liên kết.
+        // Chúng ta chỉ trả về văn bản gốc từ AI mà không thêm vào các liên kết.
         return text;
     }
     
