@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI, Part, Content } from '@google/generative-ai';
+import { GoogleGenerativeAI, Part, Content, StartChatParams } from '@google/generative-ai';
 
 export class GeminiService {
   private genAI: GoogleGenerativeAI;
@@ -38,33 +38,43 @@ export async function generateFreeChat(
     }
     
     const genAI = new GoogleGenerativeAI(apiKey);
-    // SỬA Ở ĐÂY: Dùng tên model chính xác và mạnh mẽ
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
 
+    // --- BẮT ĐẦU PHẦN SỬA LỖI ---
+
+    // 1. Định nghĩa Hướng dẫn Hệ thống (System Instruction) một cách rõ ràng
+    const systemInstruction = {
+        role: "system",
+        parts: [{ text: `You are a helpful and friendly travel assistant named Gemini. Your sole purpose is to answer questions related to travel, tourism, destinations, flights, hotels, and trip planning. 
+
+        **Strict Rule:** If a user asks a question that is NOT related to travel (e.g., about math, politics, general knowledge, etc.), you MUST politely decline. Respond in the user's language (Vietnamese or English).
+        - Vietnamese response for off-topic questions: "Xin lỗi, tôi là trợ lý du lịch và chỉ có thể trả lời các câu hỏi về du lịch. Bạn có cần tôi giúp gì cho chuyến đi của mình không?"
+        - English response for off-topic questions: "I'm sorry, as a travel assistant, I can only answer questions about travel. Is there anything I can help you with for your trip?"
+
+        **Formatting Rule:** For any list, you must use bullet points (* or -). Do not use numbered lists.` 
+        }]
+    };
+
+    // 2. Khởi tạo model với Hướng dẫn Hệ thống
+    const model = genAI.getGenerativeModel({
+        model: 'gemini-2.5-pro',
+        systemInstruction: systemInstruction.parts[0].text,
+    });
+
+    // 3. Bắt đầu phiên chat và nạp vào toàn bộ lịch sử trước đó
     const chat = model.startChat({
         history: history,
         generationConfig: {
-            maxOutputTokens: 100000, // Tăng giới hạn để có câu trả lời chi tiết hơn
+            maxOutputTokens: 20000,
         },
     });
 
-    // --- BẮT ĐẦU PHẦN SỬA LỖI ---
-    // Xây dựng prompt một cách rõ ràng và đúng chuẩn
-    const promptParts: Part[] = [];
-
-   const systemInstruction = {
-        role: "system",
-        parts: [{ text: "You are a helpful travel assistant. IMPORTANT FORMATTING RULE: For any list, you must use bullet points (* or -). Do not use numbered lists." }]
-    };
-    
-    // Thêm tin nhắn của người dùng
+    // 4. Chuẩn bị tin nhắn mới của người dùng (văn bản và hình ảnh)
+    const userParts: Part[] = [];
     if (message) {
-        promptParts.push({ text: message });
+        userParts.push({ text: message });
     }
-
-    // Thêm hình ảnh nếu có
     if (image) {
-      promptParts.push({
+      userParts.push({
         inlineData: {
           mimeType: image.mimetype,
           data: image.buffer.toString('base64'),
@@ -72,9 +82,12 @@ export async function generateFreeChat(
       });
     }
     
-    // Gửi yêu cầu với cả chỉ dẫn hệ thống và prompt của người dùng
-    const result = await model.generateContent([systemInstruction.parts[0].text, ...promptParts]);
+    // 5. Gửi tin nhắn mới bằng hàm chat.sendMessage() để duy trì cuộc hội thoại
+    const result = await chat.sendMessage(userParts);
     const response = await result.response;
+    
+    // --- KẾT THÚC PHẦN SỬA LỖI ---
+
     return response.text();
     
   } catch (error) {
