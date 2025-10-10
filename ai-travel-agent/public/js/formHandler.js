@@ -43,9 +43,6 @@ class TravelFormHandler {
             }
         });
         // END: Thêm listener
-
-        this.planContent.addEventListener('mouseup', (e) => this.handleTextSelection(e));
-        document.addEventListener('mousedown', (e) => this.handleDocumentClick(e));
     }
 
     updateBudgetDisplay() {
@@ -271,81 +268,6 @@ Please begin the itinerary now.`;
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    /**
-     * Xử lý khi người dùng bôi đen văn bản trong lịch trình
-     */
-    handleTextSelection(event) {
-        // Dùng setTimeout để đảm bảo sự kiện 'mouseup' đã hoàn tất
-        setTimeout(() => {
-            const selection = window.getSelection();
-            const selectedText = selection.toString().trim();
-
-            this.removeAskPopup(); // Xóa pop-up cũ nếu có
-
-            if (selectedText.length > 2) { // Chỉ hiện pop-up nếu chọn hơn 2 ký tự
-                const range = selection.getRangeAt(0);
-                const rect = range.getBoundingClientRect();
-                this.createAskPopup(selectedText, rect);
-            }
-        }, 10);
-    }
-
-    /**
-     * Tạo pop-up "Hỏi thêm"
-     */
-    createAskPopup(text, rect) {
-        const popup = document.createElement('div');
-        popup.id = 'selectionAskPopup';
-        popup.className = 'selection-ask-popup';
-        popup.textContent = `🔍 ${currentLang === 'vi' ? 'Hỏi thêm về' : 'Ask about'} "${text.substring(0, 20)}..."`;
-
-        // Tính toán vị trí
-        popup.style.top = `${rect.bottom + window.scrollY + 5}px`;
-        popup.style.left = `${rect.left + window.scrollX + (rect.width / 2) - 75}px`; // Căn giữa
-
-        popup.addEventListener('mousedown', (e) => e.stopPropagation()); // Ngăn sự kiện click vào pop-up làm ẩn nó đi
-        popup.addEventListener('click', () => this.askAboutSelection(text));
-
-        document.body.appendChild(popup);
-    }
-
-    /**
-     * Xử lý khi người dùng click vào pop-up
-     */
-    askAboutSelection(text) {
-        this.removeAskPopup();
-
-        // Chuyển sang tab chat
-        const chatTabButton = document.querySelector('.tab-button[data-tab="chat"]');
-        if (chatTabButton) chatTabButton.click();
-
-        // Điền câu hỏi và gửi
-        const userInput = document.getElementById('userInput');
-        const sendButton = document.getElementById('sendButton');
-
-        userInput.value = `${currentLang === 'vi' ? 'Giải thích thêm về' : 'Explain more about'}: "${text}"`;
-        sendButton.click();
-    }
-
-    /**
-     * Xóa pop-up "Hỏi thêm" khỏi DOM
-     */
-    removeAskPopup() {
-        const existingPopup = document.getElementById('selectionAskPopup');
-        if (existingPopup) {
-            existingPopup.remove();
-        }
-    }
-
-    /**
-     * Xử lý click trên toàn bộ document để ẩn pop-up
-     */
-    handleDocumentClick(event) {
-        const popup = document.getElementById('selectionAskPopup');
-        if (popup && !popup.contains(event.target)) {
-            this.removeAskPopup();
-        }
-    }
 }
 
 let formHandler;

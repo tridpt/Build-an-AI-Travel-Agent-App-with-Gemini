@@ -214,7 +214,91 @@ if (userInput) {
 }
 
 
+// ==========================================
+// SELECTION ASK POPUP LOGIC
+// ==========================================
+
+function handleTextSelection(event) {
+    // Kiểm tra xem người dùng có đang chọn text trong lịch trình hoặc trong tin nhắn của bot không
+    const planContent = event.target.closest('#planContent');
+    const botMessage = event.target.closest('.bot-message');
+
+    if (!planContent && !botMessage) {
+        return; // Nếu không phải thì không làm gì cả
+    }
+
+    // Dùng setTimeout để đảm bảo sự kiện 'mouseup' đã hoàn tất
+    setTimeout(() => {
+        const selection = window.getSelection();
+        const selectedText = selection.toString().trim();
+
+        removeAskPopup(); // Xóa pop-up cũ nếu có
+
+        if (selectedText.length > 2) {
+            const range = selection.getRangeAt(0);
+            const rect = range.getBoundingClientRect();
+            createAskPopup(selectedText, rect, !!planContent); // Thêm cờ để biết là từ tab plan
+        }
+    }, 10);
+}
+
+function createAskPopup(text, rect, isFromPlanTab) {
+    const popup = document.createElement('div');
+    popup.id = 'selectionAskPopup';
+    popup.className = 'selection-ask-popup';
+    const displayText = text.length > 25 ? text.substring(0, 25) + '...' : text;
+    popup.textContent = `🔍 ${currentLang === 'vi' ? 'Hỏi thêm về' : 'Ask about'} "${displayText}"`;
+
+    popup.style.top = `${rect.bottom + window.scrollY + 5}px`;
+    popup.style.left = `${rect.left + window.scrollX + (rect.width / 2) - 75}px`;
+
+    popup.addEventListener('mousedown', (e) => e.stopPropagation());
+    popup.addEventListener('click', () => askAboutSelection(text, isFromPlanTab));
+    
+    document.body.appendChild(popup);
+}
+
+
+function askAboutSelection(text, isFromPlanTab) {
+    removeAskPopup();
+
+    // Nếu là từ tab Plan, phải chuyển tab trước
+    if (isFromPlanTab) {
+        const chatTabButton = document.querySelector('.tab-button[data-tab="chat"]');
+        if (chatTabButton) chatTabButton.click();
+    }
+
+    const userInput = document.getElementById('userInput');
+    const sendButton = document.getElementById('sendButton');
+    
+    userInput.value = `${currentLang === 'vi' ? 'Giải thích thêm về' : 'Explain more about'}: "${text}"`;
+    
+    // Nếu từ tab Plan thì tự động gửi luôn
+    if (isFromPlanTab) {
+        sendButton.click();
+    } else {
+        userInput.focus(); // Nếu ở tab chat thì chỉ focus để người dùng tự gửi
+    }
+}
+
+function removeAskPopup() {
+    const existingPopup = document.getElementById('selectionAskPopup');
+    if (existingPopup) {
+        existingPopup.remove();
+    }
+}
+
+function handleDocumentClick(event) {
+    const popup = document.getElementById('selectionAskPopup');
+    // Nếu popup tồn tại và người dùng không click vào nó
+    if (popup && !popup.contains(event.target)) {
+        removeAskPopup();
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    document.body.addEventListener('mouseup', handleTextSelection);
+    document.addEventListener('mousedown', handleDocumentClick);
     // Thêm tin nhắn chào mừng vào khung chat
     if (chatMessages && chatMessages.children.length === 0) {
         addMessage(t('welcomeMessage'), false);
@@ -271,4 +355,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     // END: Thêm Event listener
+
+
 });
